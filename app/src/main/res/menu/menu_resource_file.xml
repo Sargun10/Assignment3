@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:title="menuItem1"
+        android:id="@+id/switchItem1"
+        android:actionLayout="@layout/switch_layout"
+        app:showAsAction="always"
+        ></item>
+    <item
+        android:id="@+id/sortByName"
+        android:title="Sort By Name"></item>
+
+    <item
+        android:id="@+id/sortByRollNo"
+        android:title="Sort By Roll No">
+
+    </item>
+
+
+</menu>
