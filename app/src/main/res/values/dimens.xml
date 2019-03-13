@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <dimen name="fontSize">12dp</dimen>
-<dimen name="gridFontSize">8dp</dimen>
+    <dimen name="fontSize">40dp</dimen>
+<dimen name="smallFontSize">12dp</dimen>
+    <dimen name="padding">20dp</dimen>
+    <dimen name="paddingEt">15dp</dimen>
+    <dimen name="marginTop">20dp</dimen>
+    <dimen name="padding10dp">10dp</dimen>
+    <dimen name="padding2dp">2dp</dimen>
+    <dimen name="margin2dp">2dp</dimen>
+    <dimen name="marginLeft5dp">5dp</dimen>
 </resources>

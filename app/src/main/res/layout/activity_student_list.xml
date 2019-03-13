@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:padding="10dp"
+    tools:context=".StudentListActivity"
+    android:padding="@dimen/padding10dp"
     android:weightSum="1"
     >
 
@@ -15,7 +15,7 @@
         android:id="@+id/recyclerViewStudents"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
+        android:padding="@dimen/padding10dp"
         android:layout_weight="1"
         >
 

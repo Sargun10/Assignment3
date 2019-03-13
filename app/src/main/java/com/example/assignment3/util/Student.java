@@ -1,6 +1,8 @@
-package com.example.assignment3;
+package com.example.assignment3.util;
 
-public class Student {
+import java.io.Serializable;
+
+public class Student implements Serializable {
 
     private String name;
     private String rollNo;
@@ -8,7 +10,7 @@ public class Student {
         this.name=name;
         this.rollNo=rollNo;
     }
-
+//setters and getters
     public void setName(String name) {
         this.name = name;
     }

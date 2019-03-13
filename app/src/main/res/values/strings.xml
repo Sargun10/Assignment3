@@ -1,3 +1,13 @@
 <resources>
-    <string name="app_name">Assignment3</string>
+    <string name="app_name">Student Management</string>
+    <string name="index">index</string>
+    <string name="RollNo">RollNo</string>
+    <string name="View">View</string>
+    <string name="Edit">Edit</string>
+    <string name="stuArr">stuArr</string>
+    <string name="Name1">Name</string>
+    <string name="Name2">Name</string>
+    <string name="Name3">Name</string>
+    <string name="RollNo1">RollNo</string>
+    <string name="Name">Name</string>
 </resources>
