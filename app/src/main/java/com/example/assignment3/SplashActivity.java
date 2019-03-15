@@ -5,20 +5,37 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+
 import com.example.assignment3.activity.StudentListActivity;
-import com.example.assignment3.util.Constants;
 
 public class SplashActivity extends AppCompatActivity {
+    public final static long SPLASH_TIME = 1000;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
+        startTimer();
+    }
+
+    /**
+     * start timer for delay in the current screen
+     */
+    private void startTimer() {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                SplashActivity.this.startActivity(new Intent(SplashActivity.this, StudentListActivity.class));
-                finish();
+                showNextScreenAndFinish();
             }
-        },(long) Constants.SPLASH_TIME);
+        }, SPLASH_TIME);
+    }
+
+    /**
+     * show the respective next screen and finish the current one
+     */
+    private void showNextScreenAndFinish() {
+        SplashActivity.this.startActivity(new Intent(SplashActivity.this, StudentListActivity.class));
+        finish();
     }
 }

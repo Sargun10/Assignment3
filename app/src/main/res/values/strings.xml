@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Student Management</string>
-    <string name="index">index</string>
     <string name="RollNo">RollNo</string>
     <string name="View">View</string>
     <string name="Edit">Edit</string>
