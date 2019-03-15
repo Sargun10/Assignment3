@@ -1,6 +1,6 @@
-package com.example.assignment3.comparator;
+package com.example.assignment3.util;
 
-import com.example.assignment3.util.Student;
+import com.example.assignment3.model.Student;
 
 import java.util.Comparator;
 

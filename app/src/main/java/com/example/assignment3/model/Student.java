@@ -1,4 +1,4 @@
-package com.example.assignment3.util;
+package com.example.assignment3.model;
 
 import java.io.Serializable;
 

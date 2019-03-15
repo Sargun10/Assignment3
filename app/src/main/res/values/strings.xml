@@ -10,4 +10,16 @@
     <string name="Name3">Name</string>
     <string name="RollNo1">RollNo</string>
     <string name="Name">Name</string>
+    <string name="Student_added">Student added !!</string>
+    <string name="update_details">Student details updated !!</string>
+    <string name="Sorted_name">Sorted By Name !</string>
+    <string name="Sorted_RollNo">Sorted By Roll No !</string>
+    <string name="Student_deleted">student record deleted !!</string>
+    <string name="Delete_confirm">Are you sure to delete?</string>
+    <string name="Yes">Yes</string>
+    <string name="No">No</string>
+    <string name="Save_changes">Save Changes</string>
+    <string name="Valid_name">enter valid name</string>
+    <string name="Valid_RollNo">Not a valid Roll Number</string>
+    <string name="Valid_Roll_No">enter valid roll no</string>
 </resources>

@@ -1,7 +1,8 @@
 package com.example.assignment3.util;
 
 import android.util.Log;
-import android.widget.Toast;
+
+import com.example.assignment3.model.Student;
 
 import java.util.ArrayList;
 
@@ -12,7 +13,7 @@ public class Validate {
     @param roll no to check this roll no in array list
     @return boolean value if roll no is unique or not
      */
-    public boolean uniqueValidation(ArrayList<Student> studentArrayList,String rollNo){
+    public boolean uniqueValidation(ArrayList<Student> studentArrayList, String rollNo){
         boolean isRollNoUnique=true;
         if(studentArrayList.size()==0){
             isRollNoUnique=true;
@@ -37,12 +38,9 @@ overloaded function to check unique roll no in array list on editing details of 
         int pos=0;
         for(int i=0;i<studentArrayList.size();i++){
             if(studentArrayList.get(i).getRollNo().equals(rollNo)){
-                Log.i("asdf",String.valueOf(studentArrayList.get(i).getRollNo()));
                 pos = i;
             }
         }
-        Log.i("asdf",String.valueOf(index));
-        Log.i("asdf",String.valueOf(pos));
 
             for(int i=0;i<studentArrayList.size();i++){
                 if(pos != index && studentArrayList.get(i).getRollNo().equals(rollNo)){
