@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,6 +18,8 @@ import android.widget.Switch;
 
 import com.example.assignment3.R;
 import com.example.assignment3.adapter.StudentAdapter;
+import com.example.assignment3.database.DbHelper;
+import com.example.assignment3.database.table.StudentTable;
 import com.example.assignment3.model.Student;
 import com.example.assignment3.util.Constants;
 import com.example.assignment3.util.SortByName;
@@ -33,16 +36,20 @@ public class StudentListActivity extends AppCompatActivity implements StudentAda
     public final static String EXTRA_IS_FROM_VIEW = "is_from_view";
     public final static String EXTRA_IS_FROM_EDIT = "is_from_edit";
     public final static String EXTRA_IS_FROM_ADD = "is_from_add";
-
-    private ArrayList<Student> studentArrayList = new ArrayList<Student>();
+    private ArrayList<Student> studentArrayList=new ArrayList<>() ;
     private StudentAdapter mStudentAdapter;
-
-    private RecyclerView rvStudents;
+    private DbHelper dbHelper;
+    public RecyclerView rvStudents;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_list);
+
+        DbHelper dbHelper=new DbHelper(this);
+      //  dbHelper.createTable();
+
+        studentArrayList=dbHelper.getAllStudents();
         initViews();
     }
 
@@ -55,7 +62,7 @@ public class StudentListActivity extends AppCompatActivity implements StudentAda
     }
 
     private void setRecyclerAdapter() {
-        mStudentAdapter = new StudentAdapter(studentArrayList, this);
+        mStudentAdapter = new StudentAdapter(studentArrayList,this);
         rvStudents.setAdapter(mStudentAdapter);
     }
 
@@ -77,6 +84,7 @@ public class StudentListActivity extends AppCompatActivity implements StudentAda
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        DbHelper dbHelper = new DbHelper(this);
         if (resultCode == RESULT_OK) {
             if (data == null) {
                 return;
@@ -85,6 +93,8 @@ public class StudentListActivity extends AppCompatActivity implements StudentAda
 
             if (requestCode == Constants.REQUEST_CODE_ADD) {
                 studentArrayList.add(student);
+
+                Log.d("-----", "added student "+studentArrayList);
                 mStudentAdapter.notifyDataSetChanged();
                 ToastDisplay.displayToast(this, getString(R.string.Student_added));
             } else if (requestCode == Constants.REQUEST_CODE_EDIT) {
@@ -162,6 +172,9 @@ public class StudentListActivity extends AppCompatActivity implements StudentAda
                             public void onClick(DialogInterface dialog, int which) {
                                 switch (which) {
                                     case DialogInterface.BUTTON_POSITIVE:
+                                        DbHelper dbHelper=new DbHelper(StudentListActivity.this);
+                                        Student student=studentArrayList.get(position);
+                                        dbHelper.deleteQuery(student);
                                         studentArrayList.remove(position);
                                         mStudentAdapter.notifyDataSetChanged();
                                         ToastDisplay.displayToast(StudentListActivity.this, getString(R.string.Student_deleted));

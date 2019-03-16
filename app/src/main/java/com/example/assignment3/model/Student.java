@@ -12,6 +12,7 @@ public class Student implements Parcelable {
         rollNo = in.readString();
     }
 
+    public Student(){}
     public Student(final String name, final String rollNo) {
         this.name = name;
         this.rollNo = rollNo;

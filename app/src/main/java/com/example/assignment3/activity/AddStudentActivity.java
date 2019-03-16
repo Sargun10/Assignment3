@@ -1,15 +1,21 @@
 package com.example.assignment3.activity;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.assignment3.R;
+import com.example.assignment3.adapter.StudentAdapter;
+import com.example.assignment3.database.DbHelper;
+import com.example.assignment3.database.table.StudentTable;
 import com.example.assignment3.model.Student;
+import com.example.assignment3.util.Constants;
 import com.example.assignment3.util.Validate;
 
 import java.util.ArrayList;
@@ -24,6 +30,7 @@ public class AddStudentActivity extends AppCompatActivity {
     private String rollNo, name;
     private int mSelectedPosition;
     private boolean mIsFromAdd = false, mIsFromEdit = false, mIsFromView = false;
+    private DbHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +39,8 @@ public class AddStudentActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_student);
         initViews();
         getSetIntentData();
+        dbHelper = new DbHelper(this);
+        studentArrayList.addAll(dbHelper.getAllStudents());
     }
 
     /**
@@ -58,7 +67,6 @@ public class AddStudentActivity extends AppCompatActivity {
             Student student = getIntent().getParcelableExtra(StudentListActivity.EXTRA_SELECTED_STUDENT);
             rollNo = student.getRollNo();
             name = student.getName();
-
             buttonSave.setVisibility(View.INVISIBLE);
             editTextName.setEnabled(false);
             editTextRollNo.setEnabled(false);
@@ -69,7 +77,6 @@ public class AddStudentActivity extends AppCompatActivity {
             Student student = getIntent().getParcelableExtra(StudentListActivity.EXTRA_SELECTED_STUDENT);
             rollNo = student.getRollNo();
             name = student.getName();
-
             getDataFromEditTexts();
             buttonSave.setText(getString(R.string.Save_changes));
         }
@@ -77,8 +84,10 @@ public class AddStudentActivity extends AppCompatActivity {
 
     // to set text in edit texts in case of both edit and view
     private void getDataFromEditTexts() {
-        editTextName.setText(name);
-        editTextRollNo.setText(rollNo);
+        DbHelper dbHelper=new DbHelper(this);
+        Student student=dbHelper.getStudent(Integer.parseInt(rollNo));
+        editTextName.setText(student.getName());
+        editTextRollNo.setText(student.getRollNo());
     }
 
     /**
@@ -90,7 +99,6 @@ public class AddStudentActivity extends AppCompatActivity {
      */
     public void onClickSave(View view) {
         Intent intentSave = new Intent(this, StudentListActivity.class);
-
         name = editTextName.getText().toString();
         rollNo = editTextRollNo.getText().toString();
         if (mIsFromAdd) {
@@ -102,6 +110,9 @@ public class AddStudentActivity extends AppCompatActivity {
                     editTextRollNo.requestFocus();
                     editTextRollNo.setError(getString(R.string.Valid_RollNo));
                 } else {
+                    Student student=new Student(name,rollNo);
+//                    Log.d("STUDENT", "onClickSave: " + student + student.getName() + student.getRollNo());
+                   dbHelper.insertQuery(student);
                     setResultOnValidation(intentSave, name, rollNo);
                 }
             }
@@ -109,6 +120,8 @@ public class AddStudentActivity extends AppCompatActivity {
             intentSave.putExtra(StudentListActivity.EXTRA_INDEX, mSelectedPosition);
 
             if (validate.uniqueValidation(studentArrayList, rollNo, mSelectedPosition)) {
+                Student student=new Student(name,rollNo);
+                dbHelper.updateQuery(student);
                 setResultOnValidation(intentSave, name, rollNo);
             } else {
                 editTextRollNo.requestFocus();
