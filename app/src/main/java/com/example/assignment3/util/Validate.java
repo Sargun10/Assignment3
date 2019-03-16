@@ -35,19 +35,21 @@ overloaded function to check unique roll no in array list on editing details of 
  */
     public boolean uniqueValidation(ArrayList<Student> studentArrayList,String rollNo,int index){
         boolean isRollNoUnique=true;
+        Log.d("-----------", "uniqueValidation: "+index);
         int pos=0;
-        for(int i=0;i<studentArrayList.size();i++){
-            if(studentArrayList.get(i).getRollNo().equals(rollNo)){
-                pos = i;
+        for(Student student:studentArrayList){
+            if(pos==index){
+                pos++;
+                continue;
             }
-        }
-
-            for(int i=0;i<studentArrayList.size();i++){
-                if(pos != index && studentArrayList.get(i).getRollNo().equals(rollNo)){
+            if(student.getRollNo().equals(rollNo)){
                     isRollNoUnique=false;
                     break;
                 }
-            }
+                pos++;
+
+
+        }Log.d("-----------", "uniqueValidation: "+isRollNoUnique);
         return isRollNoUnique;
 
     }

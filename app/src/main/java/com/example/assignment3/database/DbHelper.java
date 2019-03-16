@@ -71,13 +71,16 @@ public class DbHelper extends SQLiteOpenHelper {
         return studentArrayList;
     }
 
-    public void updateQuery(Student student){
+    public void updateQuery(Student student, String rollNo){
         SQLiteDatabase db=this.getWritableDatabase();
         ContentValues studentRecord=new ContentValues();
         studentRecord.put(StudentTable.COL_ROLL_NO,Integer.parseInt(student.getRollNo()));
         studentRecord.put(StudentTable.COL_NAME,student.getName());
         String updateQueryPart=StudentTable.COL_ROLL_NO + "=?";
-        db.update(StudentTable.TABLE_NAME,studentRecord,updateQueryPart,new String[]{student.getRollNo()});
+
+        db.update(StudentTable.TABLE_NAME,studentRecord,updateQueryPart,new String[]{rollNo});
+        Log.d("--------", "updateQuery: ");
+        db.close();
 
     }
 

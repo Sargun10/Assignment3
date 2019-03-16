@@ -28,7 +28,6 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentV
     public StudentAdapter(ArrayList<Student> studentsArrayList,Context context) {
         this.context=context;
         this.studentsArrayList = studentsArrayList;
-        Log.d("aaa", "StudentAdapter: " + studentsArrayList);
     }
 /*onCreateViewHolder inflates layout of viewholder on the screen
 @param viewGroup and i viewGroup is parent on which layout is inflated

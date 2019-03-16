@@ -93,7 +93,6 @@ public class StudentListActivity extends AppCompatActivity implements StudentAda
 
             if (requestCode == Constants.REQUEST_CODE_ADD) {
                 studentArrayList.add(student);
-
                 Log.d("-----", "added student "+studentArrayList);
                 mStudentAdapter.notifyDataSetChanged();
                 ToastDisplay.displayToast(this, getString(R.string.Student_added));

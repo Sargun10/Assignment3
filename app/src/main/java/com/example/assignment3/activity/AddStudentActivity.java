@@ -119,9 +119,9 @@ public class AddStudentActivity extends AppCompatActivity {
         } else {
             intentSave.putExtra(StudentListActivity.EXTRA_INDEX, mSelectedPosition);
 
-            if (validate.uniqueValidation(studentArrayList, rollNo, mSelectedPosition)) {
+            if (!validate.uniqueValidation(studentArrayList, rollNo, mSelectedPosition)) {
                 Student student=new Student(name,rollNo);
-                dbHelper.updateQuery(student);
+                dbHelper.updateQuery(student,studentArrayList.get(mSelectedPosition).getRollNo());
                 setResultOnValidation(intentSave, name, rollNo);
             } else {
                 editTextRollNo.requestFocus();
