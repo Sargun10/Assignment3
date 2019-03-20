@@ -9,6 +9,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <service
+            android:name=".service.BgIntentService"
+            android:exported="false"></service>
+        <service
+            android:name=".service.BgService"
+            android:enabled="true"
+            android:exported="true" />
+
         <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,12 +32,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
-
-        <activity android:name=".activity.StudentListActivity">
-
-        </activity>
-
+        <activity android:name=".activity.StudentListActivity" />
     </application>
 
 </manifest>

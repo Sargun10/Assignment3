@@ -47,8 +47,10 @@ public class DbHelper extends SQLiteOpenHelper {
 //        Log.d("aaa","after execSql");
 //    }
     public void insertQuery(Student student){
-        Log.d("STUDENT", "onClickSave: " + student + student.getName() + student.getRollNo());
+        Log.d("aaaaaa", "pahuncha"+student.toString());
         ContentValues studentRecord=new ContentValues();
+
+
         studentRecord.put(StudentTable.COL_ROLL_NO,student.getRollNo());
         studentRecord.put(StudentTable.COL_NAME,student.getName());
         SQLiteDatabase db=this.getWritableDatabase();

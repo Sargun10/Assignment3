@@ -19,8 +19,8 @@ import android.widget.Switch;
 import com.example.assignment3.R;
 import com.example.assignment3.adapter.StudentAdapter;
 import com.example.assignment3.database.DbHelper;
-import com.example.assignment3.database.table.StudentTable;
 import com.example.assignment3.model.Student;
+import com.example.assignment3.service.BgService;
 import com.example.assignment3.util.Constants;
 import com.example.assignment3.util.SortByName;
 import com.example.assignment3.util.SortByRollNo;
@@ -36,9 +36,9 @@ public class StudentListActivity extends AppCompatActivity implements StudentAda
     public final static String EXTRA_IS_FROM_VIEW = "is_from_view";
     public final static String EXTRA_IS_FROM_EDIT = "is_from_edit";
     public final static String EXTRA_IS_FROM_ADD = "is_from_add";
+    public final static String EXTRA_IS_FROM_DELETE="is_from_delete";
     private ArrayList<Student> studentArrayList=new ArrayList<>() ;
     private StudentAdapter mStudentAdapter;
-    private DbHelper dbHelper;
     public RecyclerView rvStudents;
 
     @Override
@@ -171,9 +171,9 @@ public class StudentListActivity extends AppCompatActivity implements StudentAda
                             public void onClick(DialogInterface dialog, int which) {
                                 switch (which) {
                                     case DialogInterface.BUTTON_POSITIVE:
-                                        DbHelper dbHelper=new DbHelper(StudentListActivity.this);
                                         Student student=studentArrayList.get(position);
-                                        dbHelper.deleteQuery(student);
+                                        Intent dIntent=new Intent(StudentListActivity.this, BgService.class);
+                                        dIntent.putExtra(StudentListActivity.EXTRA_IS_FROM_DELETE,true);
                                         studentArrayList.remove(position);
                                         mStudentAdapter.notifyDataSetChanged();
                                         ToastDisplay.displayToast(StudentListActivity.this, getString(R.string.Student_deleted));
