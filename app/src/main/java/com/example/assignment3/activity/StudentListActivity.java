@@ -37,32 +37,35 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class StudentListActivity extends AppCompatActivity implements StudentListFragment.OnFragmentInteractionListener {
+public class StudentListActivity extends AppCompatActivity implements StudentListFragment.OnFragmentInteractionListener,AddStudentFragment.OnFragmentInteractionListener {
     public final static String EXTRA_STUDENT_LIST = "extra_student_list";
     public final static String EXTRA_INDEX = "index";
     public final static String EXTRA_SELECTED_STUDENT = "extra_selected_student";
     public final static String EXTRA_IS_FROM_VIEW = "is_from_view";
     public final static String EXTRA_IS_FROM_EDIT = "is_from_edit";
     public final static String EXTRA_IS_FROM_ADD = "is_from_add";
-    public final static String EXTRA_IS_FROM_DELETE="is_from_delete";
+    public final static String EXTRA_IS_FROM_DELETE = "is_from_delete";
+    private static final int ADD_STUDENT_FRAG = 1;
+    private static final int STUD_LIST_FRAG = 0;
     private ViewPager viewPager;
+    private Intent intent = getIntent();
     private TabLayout tabLayout;
-    private ArrayList<Student> studentArrayList=new ArrayList<>() ;
+    private ArrayList<Student> studentArrayList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_list);
-        DbHelper dbHelper=new DbHelper(this);
-        //  dbHelper.createTable();
-
-        studentArrayList=dbHelper.getAllStudents();
-        viewPager=findViewById(R.id.viewPager);
-        tabLayout=findViewById(R.id.tabLayout);
+//        DbHelper dbHelper=new DbHelper(this);
+//        //  dbHelper.createTable();
+//
+//        studentArrayList=dbHelper.getAllStudents();
+        viewPager = findViewById(R.id.viewPager);
+        tabLayout = findViewById(R.id.tabLayout);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int i, float v, int i1) {
-                if(viewPager.getCurrentItem()==1){
+                if (viewPager.getCurrentItem() == 1) {
 
                 }
 
@@ -84,51 +87,63 @@ public class StudentListActivity extends AppCompatActivity implements StudentLis
 
 
     }
-    public void changeTab(){
-        if(viewPager.getCurrentItem()==0){
-            viewPager.setCurrentItem(1);
-        }
-    }
-    private void setViewPager(ViewPager viewPager){
-        MyPagerAdapter myPagerAdapter=new MyPagerAdapter(getSupportFragmentManager());
-        myPagerAdapter.addFragment(new StudentListFragment(),"Students");
-        myPagerAdapter.addFragment(new AddStudentFragment(),"Add Student");
+
+//    public void changeTab() {
+//        if (viewPager.getCurrentItem() == 0) {
+//            viewPager.setCurrentItem(1);
+//        } else if (viewPager.getCurrentItem() == 1) {
+//            viewPager.setCurrentItem(0);
+//        }
+//    }
+
+    private void setViewPager(ViewPager viewPager) {
+        MyPagerAdapter myPagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
+
         viewPager.setAdapter(myPagerAdapter);
     }
-    public void showData(){
-        getSupportFragmentManager().findFragmentByTag("Add Student");
+
+//    public void showData() {
+//        getSupportFragmentManager().findFragmentByTag("Add Student");
+//    }
+//
+//    @Override
+//    public void addData(Bundle bundle) {
+////        String tag = "android:switcher:" + R.id.viewPager + ":" + 0;
+////        AddStudentFragment addStudentFragment = (AddStudentFragment) getSupportFragmentManager().findFragmentByTag(tag);
+////        if (addStudentFragment != null) {
+////            addStudentFragment.addStudent(bundle);
+////            changeTab();
+////        }
+//
+//    }
+//
+//    @Override
+//    public void editData(Bundle bundle) {
+//        String tag = "android:switcher:" + R.id.viewPager + ":" + 1;
+//        AddStudentFragment addStudentFragment = (AddStudentFragment) getSupportFragmentManager().findFragmentByTag(tag);
+//        if (addStudentFragment != null) {
+//            addStudentFragment.editStudent(bundle);
+//            changeTab();
+//        }
+//    }
+
+
+    @Override
+    public void addData() {
+        viewPager.setCurrentItem(ADD_STUDENT_FRAG);
     }
 
     @Override
-    public void addData(Intent intent) {
-        String tag = "android:switcher:" + R.id.viewPager + ":" + 1;
-        AddStudentFragment addStudentFragment = (AddStudentFragment) getSupportFragmentManager().findFragmentByTag(tag);
-        if (addStudentFragment != null) {
-            addStudentFragment.getSetIntentData(intent);
-        }
+    public void editData(int position) {
 
     }
 
     @Override
-    public void editData(Intent intent) {
-        String tag = "android:switcher:" + R.id.viewPager + ":" + 1;
-        AddStudentFragment addStudentFragment = (AddStudentFragment) getSupportFragmentManager().findFragmentByTag(tag);
-        if (addStudentFragment != null) {
-            addStudentFragment.getSetIntentData(intent);
-        }
+    public void updateData() {
+//        viewPager.getAdapter().notifyDataSetChanged();
+//        viewPager.setCurrentItem(STUD_LIST_FRAG);
 
-    }
 
-    @Override
-    public void deleteStudent(Student student) {
-
-    }
-
-    @Override
-    public List<Student> refreshList() {
-        DbHelper dbHelper = new DbHelper(this);
-        List<Student> students = dbHelper.getAllStudents();
-        return students;
     }
 }
 

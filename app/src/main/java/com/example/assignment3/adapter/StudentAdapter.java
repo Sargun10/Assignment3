@@ -98,7 +98,7 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentV
         }
     }
     public interface clickRvItem{
-        boolean onCreateOptionsMenu(Menu menu);
+//        boolean onCreateOptionsMenu(Menu menu);
 
         void onItemClick(int position);
     }

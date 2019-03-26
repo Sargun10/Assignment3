@@ -66,26 +66,14 @@ public class ViewStudentActivity extends AppCompatActivity implements StudentLis
         fragmentTransaction.commit();
 
     }
+
     @Override
-    public void addData(Intent intent) {
+    public void addData() {
 
     }
 
     @Override
-    public void editData(Intent intent) {
+    public void editData(int position) {
 
-    }
-
-    @Override
-    public void deleteStudent(Student student) {
-
-    }
-
-    @Override
-    public List<Student> refreshList() {
-
-        DbHelper databaseHelper = new DbHelper(this);
-        List<Student> students = databaseHelper.getAllStudents();
-        return students;
     }
 }

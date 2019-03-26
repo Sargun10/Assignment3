@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
@@ -43,29 +45,69 @@ import static android.app.Activity.RESULT_OK;
  * Activities that contain this fragment must implement the
  * {@link StudentListFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link StudentListFragment#newInstance} factory method to
+
  * create an instance of this fragment.
  */
-public class StudentListFragment extends Fragment {
-        //implements StudentAdapter.clickRvItem{
+public class StudentListFragment extends Fragment implements StudentAdapter.clickRvItem {
+    //implements StudentAdapter.clickRvItem{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_ARRAY_LIST = "arg_array_list";
     private static final String ARG_PARAM2 = "param2";
+    public static final String VIEW_NAME = "view_name";
+    public static final String VIEW_ROLL = "view_roll";
+    public static final String VIEW = "view";
+    public static final String EDIT = "edit";
+    public static final String NORMAL = "normal";
+    public static final String MODE = "mode";
+    public static final String NAME = "name";
+    public static final String ROLL_NO = "rollNo";
+    public static final String NAME_MATCH = "^[a-zA-Z\\s]+$";
+    public static final String ROLL_MATCH = "[+-]?[0-9][0-9]*";
+
+    public static final String TABLE_NAME = "student";
+    public static final String COLUMN_ROLL_NO = "roll";
+    public static final String COLUMN_NAME = "name";
+
+    public static final int VIEW_DATA = 0;
+    public static final int EDIT_DATA = 1;
+    public static final int DELETE_DATA = 2;
+
+
+    public static final int ASYNC = 0;
+    public static final int SERVICE = 1;
+    public static final int INTENT_SERVICE = 2;
+    public static final String OPERATION = "operation";
+    public static final String STUDENT_LIST_FROM_MAIN = "student_list";
+
+    public static int NUM_ITEMS = 2;
+    public static final int STUDENT_LIST = 0;
+    public static final int ADD_STUDENT = 1;
+
 
     // TODO: Rename and change types of parameters
     private ArrayList<Student> mArrayList;
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
-    private ArrayList<Student> studentArrayList=new ArrayList<>() ;
+    private ArrayList<Student> studentArrayList = new ArrayList<>();
     private StudentAdapter mStudentAdapter;
     private Context mContext;
     public RecyclerView rvStudents;
+    private Button btnAdd;
 
     public StudentListFragment() {
         // Required empty public constructor
 
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        DbHelper dbHelper = new DbHelper(getActivity());
+
+
+        studentArrayList = dbHelper.getAllStudents();
     }
 
     /**
@@ -75,31 +117,26 @@ public class StudentListFragment extends Fragment {
      * @return A new instance of fragment StudentListFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static StudentListFragment newInstance(ArrayList<Student> studentArrayList) {
-        StudentListFragment fragment = new StudentListFragment();
-        Bundle args = new Bundle();
-        args.putParcelableArrayList(ARG_ARRAY_LIST, studentArrayList);
-//        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
+//    public StudentListFragment() {
+//
+////        Bundle args = new Bundle();
+////        args.putParcelableArrayList(ARG_ARRAY_LIST, studentArrayList);
+//////        args.putString(ARG_PARAM2, param2);
+////        fragment.setArguments(args);
+////        return fragment;
+//    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mArrayList = getArguments().getParcelableArrayList(ARG_ARRAY_LIST);
-//            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view=inflater.inflate(R.layout.fragment_student_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_student_list, container, false);
         initViews(view);
-        mContext=getActivity();
+        mContext = getActivity();
         return view;
     }
 
@@ -124,55 +161,56 @@ public class StudentListFragment extends Fragment {
      * initializing views
      */
     public void initViews(View view) {
+        btnAdd = view.findViewById(R.id.buttonAdd);
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle bundle = new Bundle();
+                bundle.putString(StudentListActivity.EXTRA_IS_FROM_ADD, "Add");
+                bundle.putParcelableArrayList("studentList", mArrayList);
+                mListener.addData();
+            }
+        });
         rvStudents = view.findViewById(R.id.recyclerViewStudents);
         setRecyclerAdapter();
     }
 
     private void setRecyclerAdapter() {
-        mStudentAdapter = new StudentAdapter(studentArrayList,mContext);
+        mStudentAdapter = new StudentAdapter(studentArrayList, mContext);
         rvStudents.setAdapter(mStudentAdapter);
     }
 
     /**
      * onclick creates a new intent to addstudent activity
      * sending array list to fetch in another activity
-     *
-     * @param view the view of the add student button
      */
-    public void onClickAddStudent(View view) {
-        Intent intent = new Intent(mContext, ViewStudentActivity.class);
-        intent.putExtra(StudentListActivity.EXTRA_STUDENT_LIST, studentArrayList);
-        intent.putExtra(StudentListActivity.EXTRA_INDEX, Constants.REQUEST_CODE_ADD);
-        intent.putExtra(StudentListActivity.EXTRA_IS_FROM_ADD, true);
-        startActivityForResult(intent, Constants.REQUEST_CODE_ADD);
-    }
 
     //this is to fetch result when control comes back from dest. class
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        DbHelper dbHelper = new DbHelper(mContext);
-        if (resultCode == RESULT_OK) {
-            if (data == null) {
-                return;
-            }
-            Student student = data.getParcelableExtra(StudentListActivity.EXTRA_SELECTED_STUDENT);
-
-            if (requestCode == Constants.REQUEST_CODE_ADD) {
-                studentArrayList.add(student);
-                Log.d("-----", "added student "+studentArrayList);
-                mStudentAdapter.notifyDataSetChanged();
-                ToastDisplay.displayToast(mContext, getString(R.string.Student_added));
-            } else if (requestCode == Constants.REQUEST_CODE_EDIT) {
-                int index = data.getIntExtra(StudentListActivity.EXTRA_INDEX, 0);
-                Student previousStudent = studentArrayList.get(index);
-                previousStudent.setName(student.getName());
-                previousStudent.setRollNo(student.getRollNo());
-                mStudentAdapter.notifyDataSetChanged();
-                ToastDisplay.displayToast(mContext, getString(R.string.update_details));
-            }
-        }
-    }
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        DbHelper dbHelper = new DbHelper(mContext);
+//        if (resultCode == RESULT_OK) {
+//            if (data == null) {
+//                return;
+//            }
+//            Student student = data.getParcelableExtra(StudentListActivity.EXTRA_SELECTED_STUDENT);
+//
+//            if (requestCode == Constants.REQUEST_CODE_ADD) {
+//                studentArrayList.add(student);
+//                Log.d("-----", "added student "+studentArrayList);
+//                mStudentAdapter.notifyDataSetChanged();
+//                ToastDisplay.displayToast(mContext, getString(R.string.Student_added));
+//            } else if (requestCode == Constants.REQUEST_CODE_EDIT) {
+//                int index = data.getIntExtra(StudentListActivity.EXTRA_INDEX, 0);
+//                Student previousStudent = studentArrayList.get(index);
+//                previousStudent.setName(student.getName());
+//                previousStudent.setRollNo(student.getRollNo());
+//                mStudentAdapter.notifyDataSetChanged();
+//                ToastDisplay.displayToast(mContext, getString(R.string.update_details));
+//            }
+//        }
+//    }
 //
 //    @Override
 //    public boolean onCreateOptionsMenu(Menu menu) {
@@ -217,8 +255,20 @@ public class StudentListFragment extends Fragment {
 //        return super.onCreateOptionsMenu(menu);
 //    }
 
-
-
+//
+//    public void addStudent(Bundle bundle){
+//        if(bundle.getString(MODE).equals(NORMAL)) {
+//            Student student = new Student(bundle.getString(NAME), bundle.getString(ROLL_NO));
+//            studentArrayList.add(student);
+//            mStudentAdapter.notifyDataSetChanged();
+//        }else if(bundle.getString(MODE).equals(EDIT)){
+////            Student student=studentArrayList.get();
+//            Student student=new Student();
+//            student.setRollNo(bundle.getString(ROLL_NO));
+//            student.setName(bundle.getString(NAME));
+//            mStudentAdapter.notifyDataSetChanged();
+//        }
+//    }
     public void onItemClick(final int position) {
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
         String[] options = {"View", "Edit", "Delete"};
@@ -227,10 +277,10 @@ public class StudentListFragment extends Fragment {
             public void onClick(DialogInterface dialog, int which) {
                 switch (which) {
                     case 0:
-                        viewMode(studentArrayList.get(position));
+//                        viewMode(studentArrayList.get(position));
                         break;
                     case 1:
-                        editMode(studentArrayList.get(position));
+//                        editMode(studentArrayList.get(position));
                         break;
                     case 2:
                         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -265,31 +315,31 @@ public class StudentListFragment extends Fragment {
     }
 
 
-    private void viewMode(final Student student) {
-        Intent intentView = new Intent(mContext, ViewStudentActivity.class);
-        intentView.putExtra(StudentListActivity.EXTRA_SELECTED_STUDENT, student);
-        intentView.putExtra(StudentListActivity.EXTRA_IS_FROM_VIEW, true);
-        startActivity(intentView);
-    }
+//    private void viewMode(final Student student) {
+//        Intent intentView = new Intent(mContext, ViewStudentActivity.class);
+//        intentView.putExtra(StudentListActivity.EXTRA_SELECTED_STUDENT, student);
+//        intentView.putExtra(StudentListActivity.EXTRA_IS_FROM_VIEW, true);
+//        startActivity(intentView);
+//    }
 
     /**
      * editMode creates intent to addstudentactivity to edit student info
      * and save changes then startactivityresult takes intent and request code for edit
-     */
-    private void editMode(final Student student) {
-        Intent intentEdit = new Intent(mContext, ViewStudentActivity.class);
-        intentEdit.putExtra(StudentListActivity.EXTRA_SELECTED_STUDENT, student);
-        int index = 0;
-        for (int i = 0; i < studentArrayList.size(); i++) {
-            if (studentArrayList.get(i).getRollNo() == student.getRollNo()) {
-                index = i;
-            }
-        }
-        intentEdit.putExtra(StudentListActivity.EXTRA_INDEX, index);
-        intentEdit.putExtra(StudentListActivity.EXTRA_IS_FROM_EDIT, true);
-        intentEdit.putParcelableArrayListExtra(StudentListActivity.EXTRA_STUDENT_LIST, studentArrayList);
-        startActivityForResult(intentEdit, Constants.REQUEST_CODE_EDIT);
-    }
+//     */
+//    private void editMode(final Student student) {
+//        Intent intentEdit = new Intent(mContext, ViewStudentActivity.class);
+//        intentEdit.putExtra(StudentListActivity.EXTRA_SELECTED_STUDENT, student);
+//        int index = 0;
+//        for (int i = 0; i < studentArrayList.size(); i++) {
+//            if (studentArrayList.get(i).getRollNo() == student.getRollNo()) {
+//                index = i;
+//            }
+//        }
+//        intentEdit.putExtra(StudentListActivity.EXTRA_INDEX, index);
+//        intentEdit.putExtra(StudentListActivity.EXTRA_IS_FROM_EDIT, true);
+//        intentEdit.putParcelableArrayListExtra(StudentListActivity.EXTRA_STUDENT_LIST, studentArrayList);
+//        startActivityForResult(intentEdit, Constants.REQUEST_CODE_EDIT);
+//    }
 
     /**
      * This interface must be implemented by activities that contain this
@@ -303,12 +353,10 @@ public class StudentListFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void addData(Intent intent);
 
-        void editData(Intent intent);
+        void addData();
 
-        void deleteStudent(Student student);
+        void editData(int position);
 
-        List<Student> refreshList();
     }
 }
