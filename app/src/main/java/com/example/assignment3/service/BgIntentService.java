@@ -6,8 +6,8 @@ import android.content.Context;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.example.assignment3.activity.AddStudentActivity;
 import com.example.assignment3.database.DbHelper;
+import com.example.assignment3.fragment.AddStudentFragment;
 import com.example.assignment3.model.Student;
 import com.example.assignment3.activity.StudentListActivity;
 
@@ -65,17 +65,17 @@ public class BgIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        intent.setAction(AddStudentActivity.INTENT_SERVICE_FILTER_ACTION_KEY);
+        intent.setAction(AddStudentFragment.INTENT_SERVICE_FILTER_ACTION_KEY);
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 
         DbHelper dbHelper = new DbHelper(this);
         dbHelper.getWritableDatabase();
         String previousStudentId = new String();
-        if(intent.hasExtra(AddStudentActivity.PREVIOUS_STUDENT_ID)) {
-            previousStudentId = intent.getStringExtra(AddStudentActivity.PREVIOUS_STUDENT_ID);
+        if(intent.hasExtra(AddStudentFragment.PREVIOUS_STUDENT_ID)) {
+            previousStudentId = intent.getStringExtra(AddStudentFragment.PREVIOUS_STUDENT_ID);
         }
-        String mode = intent.getStringExtra(AddStudentActivity.MODE);
-        Student student = intent.getParcelableExtra(AddStudentActivity.PRESENT_STUDENT);
+        String mode = intent.getStringExtra(AddStudentFragment.MODE);
+        Student student = intent.getParcelableExtra(AddStudentFragment.PRESENT_STUDENT);
         switch (mode) {
             case StudentListActivity.EXTRA_IS_FROM_ADD:
                 dbHelper.insertQuery(student);

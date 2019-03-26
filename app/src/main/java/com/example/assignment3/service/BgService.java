@@ -7,10 +7,11 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.example.assignment3.activity.AddStudentActivity;
+import com.example.assignment3.activity.ViewStudentActivity;
 import com.example.assignment3.activity.StudentListActivity;
 import com.example.assignment3.database.DbHelper;
 import com.example.assignment3.database.table.StudentTable;
+import com.example.assignment3.fragment.AddStudentFragment;
 import com.example.assignment3.model.Student;
 
 public class BgService extends Service {
@@ -19,15 +20,15 @@ public class BgService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        intent.setAction(AddStudentActivity.SERVICE_FILTER_ACTION_KEY);
+        intent.setAction(AddStudentFragment.SERVICE_FILTER_ACTION_KEY);
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
         DbHelper dbHelper;
         String previousRollNo = new String();
-        if(intent.hasExtra(AddStudentActivity.PREVIOUS_STUDENT_ID)) {
-            previousRollNo = intent.getStringExtra(AddStudentActivity.PREVIOUS_STUDENT_ID);
+        if(intent.hasExtra(AddStudentFragment.PREVIOUS_STUDENT_ID)) {
+            previousRollNo = intent.getStringExtra(AddStudentFragment.PREVIOUS_STUDENT_ID);
         }
-        String mode = intent.getStringExtra(AddStudentActivity.MODE);
-        Student student = intent.getParcelableExtra(AddStudentActivity.PRESENT_STUDENT);
+        String mode = intent.getStringExtra(AddStudentFragment.MODE);
+        Student student = intent.getParcelableExtra(AddStudentFragment.PRESENT_STUDENT);
         switch (mode) {
             case StudentListActivity.EXTRA_IS_FROM_ADD:
                 dbHelper= new DbHelper(this);
