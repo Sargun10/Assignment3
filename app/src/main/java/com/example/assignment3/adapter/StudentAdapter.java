@@ -27,6 +27,7 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentV
     private clickRvItem mListener;
 
     public StudentAdapter(ArrayList<Student> studentsArrayList,Context context) {
+        Log.d("-------------", "strt ");
         this.context=context;
         this.studentsArrayList = studentsArrayList;
     }
@@ -37,12 +38,12 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentV
     @NonNull
     @Override
     public StudentViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
+        LayoutInflater inflater = LayoutInflater.from(context);
 
         View view = inflater.inflate(R.layout.student_viewholder_layout, viewGroup, false);
 
 
-        return new StudentViewHolder(view, studentsArrayList);
+        return new StudentViewHolder(view);
     }
 /*onBindViewHolder binds layout file with the viewholder of recycler view
     @param viewHolder and i viewholder that is clicked
@@ -53,6 +54,7 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentV
 
         viewHolder.textViewName2.setText(studentsArrayList.get(i).getName());
         viewHolder.textViewRollno2.setText(studentsArrayList.get(i).getRollNo());
+
     }
     /*getitemcount keeps track of the size of the recycler view
 
@@ -60,46 +62,49 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentV
      */
     @Override
     public int getItemCount() {
-        return studentsArrayList.size();
+        return studentsArrayList==null ? 0:studentsArrayList.size();
     }
 
     /*studentviewholder class is viewholder that is made clickable
     it has arraylist,textviews,context,students
      */
-    public class StudentViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private TextView textViewName, textViewName2;
-        private TextView textViewRollNo, textViewRollno2;
+    public class StudentViewHolder extends RecyclerView.ViewHolder {
+        private TextView textViewName2;
+        private TextView textViewRollno2;
 
         /*constructor to setlistener on itemview, have context of calling activity,student arraylist
 
  */
-        public StudentViewHolder(@NonNull View itemView, ArrayList<Student> context) {
+        public StudentViewHolder(@NonNull View itemView) {
             super(itemView);
-            itemView.setOnClickListener(this);
-            initViews();
+           // itemView.setOnClickListener(this);
+            initViews(itemView);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mListener.onItemClick(getAdapterPosition());
+                }
+            });
         }
     /*initviews are finding views of xml file
  */
 
-        private void initViews() {
-            textViewName = itemView.findViewById(R.id.textViewName);
+        private void initViews(View itemView) {
             textViewName2 = itemView.findViewById(R.id.textViewName2);
-            textViewRollNo = itemView.findViewById(R.id.textViewRollNo);
             textViewRollno2 = itemView.findViewById(R.id.textViewRollNo2);
         }
         /*onClick of the viewHolder dialog box is opened with options view,edit,delete
         case 0 is view mode case 1 is edit mode and case 2 is delete
         @param view which is clicked
          */
-        @Override
-        public void onClick(View v) {
-            mListener = (clickRvItem) context;
-            mListener.onItemClick(getAdapterPosition());
-        }
     }
     public interface clickRvItem{
 //        boolean onCreateOptionsMenu(Menu menu);
 
         void onItemClick(int position);
+    }
+
+    public void setOnClickListenerRv(clickRvItem listener) {
+        mListener = listener;
     }
 }

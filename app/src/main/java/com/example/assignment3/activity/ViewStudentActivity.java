@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 
 import com.example.assignment3.R;
+import com.example.assignment3.communicator.CommunicationFragments;
 import com.example.assignment3.database.DbHelper;
 import com.example.assignment3.fragment.AddStudentFragment;
 import com.example.assignment3.fragment.StudentListFragment;
@@ -32,7 +33,7 @@ import com.example.assignment3.util.Validate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewStudentActivity extends AppCompatActivity implements StudentListFragment.OnFragmentInteractionListener {
+public class ViewStudentActivity extends AppCompatActivity  {
 
 
     private Bundle bundle;
@@ -67,13 +68,13 @@ public class ViewStudentActivity extends AppCompatActivity implements StudentLis
 
     }
 
-    @Override
-    public void addData() {
+//    @Override
+//    public void addData() {
+//
+//    }
 
-    }
-
-    @Override
-    public void editData(int position) {
-
-    }
+//    @Override
+//    public void editData(int position) {
+//
+//    }
 }

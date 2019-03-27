@@ -47,7 +47,7 @@
         android:id="@+id/buttonSave"
         android:text="Save"
         android:layout_alignParentBottom="true"
-        android:onClick="onClickSave"
+
         />
 
 

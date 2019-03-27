@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,11 +22,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import com.example.assignment3.R;
 import com.example.assignment3.activity.StudentListActivity;
 import com.example.assignment3.activity.ViewStudentActivity;
 import com.example.assignment3.adapter.StudentAdapter;
+import com.example.assignment3.communicator.CommunicationFragments;
 import com.example.assignment3.database.DbHelper;
 import com.example.assignment3.model.Student;
 import com.example.assignment3.service.BgService;
@@ -43,53 +46,21 @@ import static android.app.Activity.RESULT_OK;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link StudentListFragment.OnFragmentInteractionListener} interface
+ * <p>
  * to handle interaction events.
-
+ * <p>
  * create an instance of this fragment.
  */
-public class StudentListFragment extends Fragment implements StudentAdapter.clickRvItem {
-    //implements StudentAdapter.clickRvItem{
+public class StudentListFragment extends BaseFragment{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_ARRAY_LIST = "arg_array_list";
-    private static final String ARG_PARAM2 = "param2";
-    public static final String VIEW_NAME = "view_name";
-    public static final String VIEW_ROLL = "view_roll";
-    public static final String VIEW = "view";
-    public static final String EDIT = "edit";
-    public static final String NORMAL = "normal";
-    public static final String MODE = "mode";
-    public static final String NAME = "name";
-    public static final String ROLL_NO = "rollNo";
-    public static final String NAME_MATCH = "^[a-zA-Z\\s]+$";
-    public static final String ROLL_MATCH = "[+-]?[0-9][0-9]*";
-
-    public static final String TABLE_NAME = "student";
-    public static final String COLUMN_ROLL_NO = "roll";
-    public static final String COLUMN_NAME = "name";
-
-    public static final int VIEW_DATA = 0;
-    public static final int EDIT_DATA = 1;
-    public static final int DELETE_DATA = 2;
-
-
-    public static final int ASYNC = 0;
-    public static final int SERVICE = 1;
-    public static final int INTENT_SERVICE = 2;
-    public static final String OPERATION = "operation";
-    public static final String STUDENT_LIST_FROM_MAIN = "student_list";
-
-    public static int NUM_ITEMS = 2;
-    public static final int STUDENT_LIST = 0;
-    public static final int ADD_STUDENT = 1;
 
 
     // TODO: Rename and change types of parameters
     private ArrayList<Student> mArrayList;
     private String mParam2;
 
-    private OnFragmentInteractionListener mListener;
+    private CommunicationFragments mListener;
     private ArrayList<Student> studentArrayList = new ArrayList<>();
     private StudentAdapter mStudentAdapter;
     private Context mContext;
@@ -102,59 +73,103 @@ public class StudentListFragment extends Fragment implements StudentAdapter.clic
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        DbHelper dbHelper = new DbHelper(getActivity());
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        this.mContext=context;
+        if (context instanceof CommunicationFragments) {
+            mListener = (CommunicationFragments) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
 
-
-        studentArrayList = dbHelper.getAllStudents();
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment StudentListFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-//    public StudentListFragment() {
-//
-////        Bundle args = new Bundle();
-////        args.putParcelableArrayList(ARG_ARRAY_LIST, studentArrayList);
-//////        args.putString(ARG_PARAM2, param2);
-////        fragment.setArguments(args);
-////        return fragment;
-//    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_student_list, container, false);
         initViews(view);
         mContext = getActivity();
+        refresh();
+        handleRecyclerClick();
         return view;
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
+    public void handleRecyclerClick(){
+        mStudentAdapter.setOnClickListenerRv(new StudentAdapter.clickRvItem() {
+            @Override
+            public void onItemClick(final int position) {
+                final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
+                String[] options = {"View", "Edit", "Delete"};
+                alertDialogBuilder.setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                viewMode(studentArrayList.get(position));
+                                break;
+                            case 1:
+                                editMode(position);
+                                break;
+                            case 2:
+                                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        switch (which) {
+                                            case DialogInterface.BUTTON_POSITIVE:
+                                        Intent dIntent=new Intent(mContext, BgService.class);
+                                        dIntent.putExtra(StudentListActivity.EXTRA_IS_FROM_DELETE,true);
+                                        studentArrayList.remove(position);
+
+                                                mStudentAdapter.notifyDataSetChanged();
+                                                ToastDisplay.displayToast(mContext, getString(R.string.Student_deleted));
+                                                break;
+
+                                            case DialogInterface.BUTTON_NEGATIVE:
+                                                dialog.dismiss();
+                                                break;
+                                        }
+                                    }
+                                };
+                                AlertDialog.Builder ab = new AlertDialog.Builder(mContext);
+                                ab.setMessage(getString(R.string.Delete_confirm)).setPositiveButton(getString(R.string.Yes), dialogClickListener)
+                                        .setNegativeButton(getString(R.string.No), dialogClickListener).show();
+                                break;
+                        }
+                    }
+                });
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+
+
+            }
+        });
     }
+
+
 
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void refresh() {
+
+        studentArrayList = getArguments().getParcelableArrayList("studentList");
+        mStudentAdapter = new StudentAdapter(studentArrayList, mContext);
+        rvStudents.setAdapter(mStudentAdapter);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(mContext.getApplicationContext());
+        rvStudents.setLayoutManager(mLayoutManager);
+        rvStudents.setItemAnimator(new DefaultItemAnimator());
+        mStudentAdapter.notifyDataSetChanged();
+
     }
 
     /**
@@ -165,21 +180,16 @@ public class StudentListFragment extends Fragment implements StudentAdapter.clic
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putString(StudentListActivity.EXTRA_IS_FROM_ADD, "Add");
-                bundle.putParcelableArrayList("studentList", mArrayList);
-                mListener.addData();
+                mListener.callOtherFragToAdd();
+                Bundle bundle=new Bundle();
+//                bundle.putString(StudentListActivity.EXTRA_IS_FROM_ADD,);
+//                mListener.getMode(bundle);
             }
         });
+
         rvStudents = view.findViewById(R.id.recyclerViewStudents);
-        setRecyclerAdapter();
-    }
 
-    private void setRecyclerAdapter() {
-        mStudentAdapter = new StudentAdapter(studentArrayList, mContext);
-        rvStudents.setAdapter(mStudentAdapter);
     }
-
     /**
      * onclick creates a new intent to addstudent activity
      * sending array list to fetch in another activity
@@ -255,108 +265,36 @@ public class StudentListFragment extends Fragment implements StudentAdapter.clic
 //        return super.onCreateOptionsMenu(menu);
 //    }
 
-//
-//    public void addStudent(Bundle bundle){
-//        if(bundle.getString(MODE).equals(NORMAL)) {
-//            Student student = new Student(bundle.getString(NAME), bundle.getString(ROLL_NO));
-//            studentArrayList.add(student);
-//            mStudentAdapter.notifyDataSetChanged();
-//        }else if(bundle.getString(MODE).equals(EDIT)){
-////            Student student=studentArrayList.get();
-//            Student student=new Student();
-//            student.setRollNo(bundle.getString(ROLL_NO));
-//            student.setName(bundle.getString(NAME));
-//            mStudentAdapter.notifyDataSetChanged();
-//        }
-//    }
-    public void onItemClick(final int position) {
-        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
-        String[] options = {"View", "Edit", "Delete"};
-        alertDialogBuilder.setItems(options, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case 0:
-//                        viewMode(studentArrayList.get(position));
-                        break;
-                    case 1:
-//                        editMode(studentArrayList.get(position));
-                        break;
-                    case 2:
-                        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                switch (which) {
-                                    case DialogInterface.BUTTON_POSITIVE:
-//                                        Student student=studentArrayList.get(position);
-//                                        Intent dIntent=new Intent(mContext, BgService.class);
-//                                        dIntent.putExtra(StudentListActivity.EXTRA_IS_FROM_DELETE,true);
-//                                        studentArrayList.remove(position);
-
-                                        mStudentAdapter.notifyDataSetChanged();
-                                        ToastDisplay.displayToast(mContext, getString(R.string.Student_deleted));
-                                        break;
-
-                                    case DialogInterface.BUTTON_NEGATIVE:
-                                        dialog.dismiss();
-                                        break;
-                                }
-                            }
-                        };
-                        AlertDialog.Builder ab = new AlertDialog.Builder(mContext);
-                        ab.setMessage(getString(R.string.Delete_confirm)).setPositiveButton(getString(R.string.Yes), dialogClickListener)
-                                .setNegativeButton(getString(R.string.No), dialogClickListener).show();
-                        break;
-                }
-            }
-        });
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
-    }
 
 
-//    private void viewMode(final Student student) {
-//        Intent intentView = new Intent(mContext, ViewStudentActivity.class);
-//        intentView.putExtra(StudentListActivity.EXTRA_SELECTED_STUDENT, student);
-//        intentView.putExtra(StudentListActivity.EXTRA_IS_FROM_VIEW, true);
-//        startActivity(intentView);
-//    }
+   private void viewMode(final Student student) {
+       Intent intentView = new Intent(mContext, ViewStudentActivity.class);
+       intentView.putExtra(StudentListActivity.EXTRA_SELECTED_STUDENT, student);
+       intentView.putExtra(StudentListActivity.EXTRA_IS_FROM_VIEW, true);
+       startActivity(intentView);
+   }
 
     /**
      * editMode creates intent to addstudentactivity to edit student info
      * and save changes then startactivityresult takes intent and request code for edit
-//     */
-//    private void editMode(final Student student) {
-//        Intent intentEdit = new Intent(mContext, ViewStudentActivity.class);
-//        intentEdit.putExtra(StudentListActivity.EXTRA_SELECTED_STUDENT, student);
-//        int index = 0;
-//        for (int i = 0; i < studentArrayList.size(); i++) {
-//            if (studentArrayList.get(i).getRollNo() == student.getRollNo()) {
-//                index = i;
-//            }
-//        }
-//        intentEdit.putExtra(StudentListActivity.EXTRA_INDEX, index);
-//        intentEdit.putExtra(StudentListActivity.EXTRA_IS_FROM_EDIT, true);
-//        intentEdit.putParcelableArrayListExtra(StudentListActivity.EXTRA_STUDENT_LIST, studentArrayList);
-//        startActivityForResult(intentEdit, Constants.REQUEST_CODE_EDIT);
-//    }
+     //     */
+   private void editMode(final int position) {
+//       bundle.putParcelable(StudentListActivity.EXTRA_SELECTED_STUDENT, student);
+       Bundle bundle=new Bundle();
+//       int index = 0;
+//       for (int i = 0; i < studentArrayList.size(); i++) {
+//           if (studentArrayList.get(i).getRollNo() == student.getRollNo()) {
+//               index = i;
+//           }
+//       }
+       bundle.putInt(StudentListActivity.EXTRA_INDEX, position);
+       bundle.putBoolean(StudentListActivity.EXTRA_IS_FROM_EDIT,true);
+//       bundle.putBoolean(StudentListActivity.EXTRA_IS_FROM_EDIT, true);
+//       bundle.putParcelableArrayList(StudentListActivity.EXTRA_STUDENT_LIST, studentArrayList);
+   //    mListener.communicateEditStudent(bundle);
+       mListener.getMode(bundle);
+       Log.d("----------", "editMode: " );
+//       mListener.callOtherFragToAdd();
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-
-        void addData();
-
-        void editData(int position);
-
-    }
+   }
 }
