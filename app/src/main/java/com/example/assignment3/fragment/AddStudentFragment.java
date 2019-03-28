@@ -33,6 +33,7 @@ import com.example.assignment3.model.Student;
 import com.example.assignment3.service.BgAsync;
 import com.example.assignment3.service.BgIntentService;
 import com.example.assignment3.service.BgService;
+import com.example.assignment3.util.Constants;
 import com.example.assignment3.util.Validate;
 
 import java.util.ArrayList;
@@ -43,54 +44,26 @@ import static android.app.Activity.RESULT_OK;
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
  * to handle interaction events.
- * Use the {@link AddStudentFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
 
 public class AddStudentFragment extends BaseFragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-    public static final String SERVICE_FILTER_ACTION_KEY = "filter_action_service";
-    public static final String INTENT_SERVICE_FILTER_ACTION_KEY = "filter_action_intent_service";
-    public static String PRESENT_STUDENT = "presentStudent";
-    public static String MODE = "mode";
-    public static boolean isFromEdit = false;
-    public static String PREVIOUS_STUDENT_ID = "previousStudentId";
     private Button buttonSave;
     private EditText editTextName, editTextRollNo;
     private ArrayList<Student> studentArrayList = new ArrayList<Student>();
     private Context mContext;
     Validate validate = new Validate();
     private String rollNo, name;
-    public static int mSelectedPosition;
-    public static boolean mIsFromAdd = false, mIsFromEdit = false, mIsFromView = false;
+    private static int mSelectedPosition;
+    private static boolean mIsFromAdd, mIsFromEdit;
     private DbHelper dbHelper;
     private MyReceiver myReceiver;
     AlertDialog mAlert;
-    StudentAdapter mStudentAdapter;
-
     Student student;
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
     private CommunicationFragments mListener;
-
     public AddStudentFragment() {
         // Required empty public constructor
     }
-
-    public static AddStudentFragment newInstance(String param1, String param2) {
-        AddStudentFragment fragment = new AddStudentFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onAttach(Context context) {
         this.mContext = context;
@@ -107,12 +80,6 @@ public class AddStudentFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-
-
         dbHelper = new DbHelper(mContext);
         studentArrayList.addAll(dbHelper.getAllStudents());
     }
@@ -143,66 +110,17 @@ public class AddStudentFragment extends BaseFragment {
     }
 
     public void getMode(Bundle bundle) {
-        mSelectedPosition = bundle.getInt(StudentListActivity.EXTRA_INDEX, -1);
-        mIsFromAdd = bundle.getBoolean(StudentListActivity.EXTRA_IS_FROM_ADD, false);
-        mIsFromEdit = bundle.getBoolean(StudentListActivity.EXTRA_IS_FROM_EDIT, false);
-        Log.d("aaaaaaaaaaa", "getMode: "+mSelectedPosition);
-        if(mIsFromEdit){
-             student = bundle.getParcelable(StudentListActivity.EXTRA_SELECTED_STUDENT);
-            Log.d("roll", "getMode: "+mIsFromAdd +  mIsFromEdit + student.getName() + student.getRollNo());
-
+        mSelectedPosition = bundle.getInt(Constants.INDEX, -1);
+        mIsFromAdd = bundle.getBoolean(Constants.IS_FROM_ADD, false);
+        mIsFromEdit = bundle.getBoolean(Constants.IS_FROM_EDIT, false);
+        if (mIsFromAdd) {
+            clearFields();
+        }
+        if (mIsFromEdit) {
+            student = bundle.getParcelable(Constants.SELECTED_STUDENT);
             getDataFromEditTexts(student);
         }
-
-       /* Log.d("----------", "getMode: ");
-        if (mIsFromAdd) {
-            addStudent();
-        } else if (mIsFromEdit) {
-            editStudent(mSelectedPosition);
-        }*/
     }
-
-/*    private void editStudent(final int position) {
-        Log.d("-------------", String.valueOf(position)+"            "+studentArrayList.size());
-        editTextName.setText(studentArrayList.get(position).getName());
-        editTextRollNo.setText(studentArrayList.get(position).getRollNo());
-
-        buttonSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("h", "onClick: up");
-                //Validation lgauni
-                name = editTextName.getText().toString();
-                rollNo = editTextRollNo.getText().toString();
-
-                Student student = studentArrayList.get(position);
-                student.setName(name);
-                student.setRollNo(rollNo);
-
-//                mListener.callOtherFragToAdd();
-                serviceDialogBox(student, StudentListActivity.EXTRA_IS_FROM_EDIT, StudentListActivity.EXTRA_SELECTED_STUDENT);
-                editTextName.setFocusable(false);
-                editTextRollNo.setFocusable(false);
-            }
-        });
-
-    }
-
-    private void addStudent() {
-        buttonSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("h", "onClick: ");
-                name = editTextName.getText().toString();
-                rollNo = editTextRollNo.getText().toString();
-                Student student = new Student(name, rollNo);
-                serviceDialogBox(student, StudentListActivity.EXTRA_IS_FROM_ADD, StudentListActivity.EXTRA_SELECTED_STUDENT);
-                editTextName.setFocusable(false);
-                editTextRollNo.setFocusable(false);
-            }
-        });
-    }*/
-
     /**
      * on click of save button data is fetched from edit text and validations are applied
      * string name should not be null and has only alphabets
@@ -219,7 +137,6 @@ public class AddStudentFragment extends BaseFragment {
             public void onClick(View v) {
                 name = editTextName.getText().toString();
                 rollNo = editTextRollNo.getText().toString();
-//                Log.d("roll", "onClick    -----------: " + mIsFromAdd + mIsFromEdit);
                 if (mIsFromAdd) {
                     if (name.trim().length() == 0 || !validate.isStringOnly(name)) {
                         editTextName.requestFocus();
@@ -229,10 +146,11 @@ public class AddStudentFragment extends BaseFragment {
                             editTextRollNo.requestFocus();
                             editTextRollNo.setError(getString(R.string.Valid_RollNo));
                         } else {
+//                            clearFields();
                             Student student = new Student(name, rollNo);
                             editTextName.setFocusable(false);
                             editTextRollNo.setFocusable(false);
-                            serviceDialogBox(student, StudentListActivity.EXTRA_IS_FROM_ADD, null);
+                            serviceDialogBox(student, Constants.IS_FROM_ADD, rollNo);
                         }
                     }
                 } else if(mIsFromEdit){
@@ -241,15 +159,17 @@ public class AddStudentFragment extends BaseFragment {
                         editTextName.setError(getString(R.string.Valid_name));
                     }
                         else {
-                        editTextName.setEnabled(false);
-                        editTextRollNo.setEnabled(false);
+                        Log.d("---------", "mIsFromEditttttttt "+student);
+//                            getDataFromEditTexts(student);
+                            editTextName.setEnabled(false);
+                            editTextRollNo.setEnabled(false);
                             Student newstudent = new Student(name, rollNo);
-                            serviceDialogBox(newstudent, StudentListActivity.EXTRA_IS_FROM_EDIT,student.getRollNo());
+                            serviceDialogBox(newstudent, Constants.IS_FROM_EDIT,student.getRollNo());
                             editTextName.setEnabled(true);
                             editTextRollNo.setEnabled(true);
-                        Bundle bundle = new Bundle();
-                     bundle.putInt(StudentListActivity.EXTRA_INDEX, mSelectedPosition);
-                       bundle.putParcelable(StudentListActivity.EXTRA_SELECTED_STUDENT, student);
+                            Bundle bundle = new Bundle();
+                            bundle.putInt(Constants.INDEX, mSelectedPosition);
+                            bundle.putParcelable(Constants.SELECTED_STUDENT, student);
                         }
                     }
                 }
@@ -293,39 +213,39 @@ public class AddStudentFragment extends BaseFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Bundle bundle = new Bundle();
-                bundle.putParcelableArrayList(StudentListActivity.BUNDLE_ARRAY_LIST,studentArrayList);
+                bundle.putParcelableArrayList(Constants.BUNDLE_ARRAY_LIST,studentArrayList);
                 switch (which) {
                     case 0:
                         Intent serviceIntent = new Intent(mContext, BgService.class);
-                        serviceIntent.putExtra(PRESENT_STUDENT, presentStudent);
-                        serviceIntent.putExtra(MODE, mode);
-                        serviceIntent.putExtra(PREVIOUS_STUDENT_ID, previousStudentPosition);
+                        serviceIntent.putExtra(Constants.PRESENT_STUDENT, presentStudent);
+                        serviceIntent.putExtra(Constants.MODE, mode);
+                        serviceIntent.putExtra(Constants.PREVIOUS_STUDENT_ID, previousStudentPosition);
+                        mContext.startService(serviceIntent);
                         if(mIsFromAdd){
+                            Log.d("----------", "onClick: "+presentStudent.getName());
                             mListener.communicateAddStudent(presentStudent);
-                            mContext.startService(serviceIntent);
                         }
                         else if(mIsFromEdit){
                             Log.d("aaaaaaa", "onClick: "+mode);
-                            bundle.putInt(StudentListActivity.EXTRA_INDEX,mSelectedPosition);
-                            bundle.putParcelable(StudentListActivity.EXTRA_SELECTED_STUDENT, presentStudent);
+                            bundle.putInt(Constants.INDEX,mSelectedPosition);
+                            bundle.putParcelable(Constants.SELECTED_STUDENT, presentStudent);
                             mListener.communicateEditStudent(bundle);
-                            mContext.startService(serviceIntent);
                         }
 //                        getActivity().finish();
                         break;
                     case 1:
                         Intent iSIntent = new Intent(mContext, BgIntentService.class);
-                        iSIntent.putExtra(PRESENT_STUDENT, presentStudent);
-                        iSIntent.putExtra(MODE, mode);
-                        iSIntent.putExtra(PREVIOUS_STUDENT_ID, previousStudentPosition);
+                        iSIntent.putExtra(Constants.PRESENT_STUDENT, presentStudent);
+                        iSIntent.putExtra(Constants.MODE, mode);
+                        iSIntent.putExtra(Constants.PREVIOUS_STUDENT_ID, previousStudentPosition);
                         getActivity().startService(iSIntent);
                         if(mIsFromAdd){
                             mListener.communicateAddStudent(presentStudent);
                         }
                         else if(mIsFromEdit){
                         Log.d("aaaaaaa", "onClick: "+mode);
-                            bundle.putInt(StudentListActivity.EXTRA_INDEX,mSelectedPosition);
-                        bundle.putParcelable(StudentListActivity.EXTRA_SELECTED_STUDENT, presentStudent);
+                            bundle.putInt(Constants.INDEX,mSelectedPosition);
+                        bundle.putParcelable(Constants.SELECTED_STUDENT, presentStudent);
                         mListener.communicateEditStudent(bundle);
                     }
                         break;
@@ -337,8 +257,8 @@ public class AddStudentFragment extends BaseFragment {
                         }
                         else if(mIsFromEdit){
                         Log.d("aaaaaaa", "onClick: "+mode);
-                            bundle.putInt(StudentListActivity.EXTRA_INDEX,mSelectedPosition);
-                        bundle.putParcelable(StudentListActivity.EXTRA_SELECTED_STUDENT, presentStudent);
+                            bundle.putInt(Constants.INDEX,mSelectedPosition);
+                        bundle.putParcelable(Constants.SELECTED_STUDENT, presentStudent);
                         mListener.communicateEditStudent(bundle);
                     }
 //                        getActivity().finish();
@@ -355,8 +275,8 @@ public class AddStudentFragment extends BaseFragment {
     private void setReceiver() {
         myReceiver = new MyReceiver();
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(SERVICE_FILTER_ACTION_KEY);
-        intentFilter.addAction(INTENT_SERVICE_FILTER_ACTION_KEY);
+        intentFilter.addAction(Constants.SERVICE_FILTER_ACTION_KEY);
+        intentFilter.addAction(Constants.INTENT_SERVICE_FILTER_ACTION_KEY);
         LocalBroadcastManager.getInstance(mContext).registerReceiver(myReceiver, intentFilter);
     }
 
@@ -374,15 +294,20 @@ public class AddStudentFragment extends BaseFragment {
 
     @Override
     public void refresh() {
-        studentArrayList = getArguments().getParcelableArrayList(StudentListActivity.BUNDLE_ARRAY_LIST);
+        studentArrayList = getArguments().getParcelableArrayList(Constants.BUNDLE_ARRAY_LIST);
 
+    }
+
+    public void clearFields() {
+        editTextRollNo.setText("");
+        editTextName.setText("");
     }
 
     private class MyReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(SERVICE_FILTER_ACTION_KEY) || intent.getAction().equals(INTENT_SERVICE_FILTER_ACTION_KEY)) {
+            if (intent.getAction().equals(Constants.SERVICE_FILTER_ACTION_KEY) || intent.getAction().equals(Constants.INTENT_SERVICE_FILTER_ACTION_KEY)) {
                 mAlert.dismiss();
                 //getActivity().finish();
             }

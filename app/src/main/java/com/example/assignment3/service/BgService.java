@@ -13,6 +13,7 @@ import com.example.assignment3.database.DbHelper;
 import com.example.assignment3.database.table.StudentTable;
 import com.example.assignment3.fragment.AddStudentFragment;
 import com.example.assignment3.model.Student;
+import com.example.assignment3.util.Constants;
 
 public class BgService extends Service {
     public BgService() {
@@ -20,26 +21,27 @@ public class BgService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        intent.setAction(AddStudentFragment.SERVICE_FILTER_ACTION_KEY);
+        intent.setAction(Constants.SERVICE_FILTER_ACTION_KEY);
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
         DbHelper dbHelper;
         String previousRollNo = new String();
-        if(intent.hasExtra(AddStudentFragment.PREVIOUS_STUDENT_ID)) {
-            previousRollNo = intent.getStringExtra(AddStudentFragment.PREVIOUS_STUDENT_ID);
+        if(intent.hasExtra(Constants.PREVIOUS_STUDENT_ID)) {
+            previousRollNo = intent.getStringExtra(Constants.PREVIOUS_STUDENT_ID);
         }
-        String mode = intent.getStringExtra(AddStudentFragment.MODE);
-        Student student = intent.getParcelableExtra(AddStudentFragment.PRESENT_STUDENT);
+        String mode = intent.getStringExtra(Constants.MODE);
+        Log.d("---------", "onStartCommand: "+mode);
+        Student student = intent.getParcelableExtra(Constants.PRESENT_STUDENT);
         switch (mode) {
-            case StudentListActivity.EXTRA_IS_FROM_ADD:
+            case Constants.IS_FROM_ADD:
                 dbHelper= new DbHelper(this);
                 dbHelper.insertQuery(student);
                 break;
-            case StudentListActivity.EXTRA_IS_FROM_EDIT:
+            case Constants.IS_FROM_EDIT:
                 dbHelper = new DbHelper(this);
                 Log.d("--------", "onStartCommand: update query service");
                 dbHelper.updateQuery(student,previousRollNo);
                 break;
-            case StudentListActivity.EXTRA_IS_FROM_DELETE:
+            case Constants.IS_FROM_DELETE:
                 dbHelper = new DbHelper(this);
                 dbHelper.deleteQuery(student);
                 break;

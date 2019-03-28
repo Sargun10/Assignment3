@@ -52,14 +52,6 @@ import static android.app.Activity.RESULT_OK;
  * create an instance of this fragment.
  */
 public class StudentListFragment extends BaseFragment{
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-
-
-    // TODO: Rename and change types of parameters
-    private ArrayList<Student> mArrayList;
-    private String mParam2;
-
     private CommunicationFragments mListener;
     private ArrayList<Student> studentArrayList = new ArrayList<>();
     private StudentAdapter mStudentAdapter;
@@ -94,12 +86,46 @@ public class StudentListFragment extends BaseFragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_student_list, container, false);
         initViews(view);
+        setHasOptionsMenu(true);
         mContext = getActivity();
-        refresh();
+        studentArrayList=getArguments().getParcelableArrayList(Constants.BUNDLE_ARRAY_LIST);
+        mStudentAdapter = new StudentAdapter(studentArrayList, mContext);
+        rvStudents.setAdapter(mStudentAdapter);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(mContext.getApplicationContext());
+        rvStudents.setLayoutManager(mLayoutManager);
+        rvStudents.setItemAnimator(new DefaultItemAnimator());
+        mStudentAdapter.notifyDataSetChanged();
         handleRecyclerClick();
         return view;
     }
+    /**
+     * initializing views and setting OnClick listener on Add button
+     * when add button is clicked bundle is sent to activity
+     * @param view
+     */
+    public void initViews(View view) {
+        btnAdd = view.findViewById(R.id.buttonAdd);
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle bundle=new Bundle();
+                bundle.putBoolean(Constants.IS_FROM_ADD,true);
+                bundle.putParcelableArrayList(Constants.BUNDLE_ARRAY_LIST,studentArrayList);
+                StudentListFragment.this.setArguments(bundle);
+                mListener.callOtherFragToAdd();
+                mListener.getMode(bundle);
 
+            }
+        });
+
+        rvStudents = view.findViewById(R.id.recyclerViewStudents);
+
+    }
+
+    /**
+     * handling events on clicking on item of recycler view
+     * view edit delete
+     */
     public void handleRecyclerClick(){
         mStudentAdapter.setOnClickListenerRv(new StudentAdapter.clickRvItem() {
             @Override
@@ -110,22 +136,21 @@ public class StudentListFragment extends BaseFragment{
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
-                            case 0:
+                            case Constants.OPTION_VIEW:
                                 viewMode(studentArrayList.get(position));
                                 break;
-                            case 1:
+                            case Constants.OPTION_EDIT:
                                 editMode(position);
                                 break;
-                            case 2:
+                            case Constants.OPTION_DELETE:
                                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         switch (which) {
                                             case DialogInterface.BUTTON_POSITIVE:
-                                        Intent dIntent=new Intent(mContext, BgService.class);
-                                        dIntent.putExtra(StudentListActivity.EXTRA_IS_FROM_DELETE,true);
-                                        studentArrayList.remove(position);
-
+                                                DbHelper dbHelper=new DbHelper(mContext);
+                                                dbHelper.deleteQuery(studentArrayList.get(position));
+                                                studentArrayList.remove(position);
                                                 mStudentAdapter.notifyDataSetChanged();
                                                 ToastDisplay.displayToast(mContext, getString(R.string.Student_deleted));
                                                 break;
@@ -162,144 +187,86 @@ public class StudentListFragment extends BaseFragment{
     @Override
     public void refresh() {
 
-        studentArrayList = getArguments().getParcelableArrayList("studentList");
-        mStudentAdapter = new StudentAdapter(studentArrayList, mContext);
-        rvStudents.setAdapter(mStudentAdapter);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(mContext.getApplicationContext());
-        rvStudents.setLayoutManager(mLayoutManager);
-        rvStudents.setItemAnimator(new DefaultItemAnimator());
-        mStudentAdapter.notifyDataSetChanged();
+       // studentArrayList = getArguments().getParcelableArrayList("studentList");
+
 
     }
 
     /**
-     * initializing views
+     * to create options menu for the activity that has two functions
+     * to show data in grid or list view
+     * to sort data by roll no or by name
+     * @param menu
+     * @param menuInflater
      */
-    public void initViews(View view) {
-        btnAdd = view.findViewById(R.id.buttonAdd);
-        btnAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Bundle bundle=new Bundle();
-                bundle.putBoolean(StudentListActivity.EXTRA_IS_FROM_ADD,true);
-                bundle.putParcelableArrayList(StudentListActivity.BUNDLE_ARRAY_LIST,studentArrayList);
-                StudentListFragment.this.setArguments(bundle);
-                mListener.callOtherFragToAdd();
-                mListener.getMode(bundle);
+    public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
 
+        menuInflater = getActivity().getMenuInflater();
+        menuInflater.inflate(R.menu.menu_resource_file, menu);
+        MenuItem item = menu.findItem(R.id.switchItem1);
+        MenuItem sortByName = menu.findItem(R.id.sortByName);
+        MenuItem sortByRollNo = menu.findItem(R.id.sortByRollNo);
+        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mContext);
+        rvStudents.setLayoutManager(linearLayoutManager);
+        sortByName.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Collections.sort(studentArrayList, new SortByName());
+                mStudentAdapter.notifyDataSetChanged();
+                ToastDisplay.displayToast(mContext, getString(R.string.Sorted_name));
+                return true;
             }
         });
-
-        rvStudents = view.findViewById(R.id.recyclerViewStudents);
-
+        sortByRollNo.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Collections.sort(studentArrayList, new SortByRollNo());
+                mStudentAdapter.notifyDataSetChanged();
+                ToastDisplay.displayToast(mContext, getString(R.string.Sorted_RollNo));
+                return true;
+            }
+        });
+        item.setActionView(R.layout.switch_layout);
+        Switch switchLayout = menu.findItem(R.id.switchItem1).getActionView().findViewById(R.id.switchFirst);
+        switchLayout.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    rvStudents.setLayoutManager(new GridLayoutManager(mContext, 2));
+                } else {
+                    rvStudents.setLayoutManager(linearLayoutManager);
+                }
+            }
+        });
+        super.onCreateOptionsMenu(menu,menuInflater);
     }
+
+
     /**
-     * onclick creates a new intent to addstudent activity
-     * sending array list to fetch in another activity
+     * this sends data to the ViewStudentActivity and views the student
+     * @param student
      */
-
-    //this is to fetch result when control comes back from dest. class
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        DbHelper dbHelper = new DbHelper(mContext);
-//        if (resultCode == RESULT_OK) {
-//            if (data == null) {
-//                return;
-//            }
-//            Student student = data.getParcelableExtra(StudentListActivity.EXTRA_SELECTED_STUDENT);
-//
-//            if (requestCode == Constants.REQUEST_CODE_ADD) {
-//                studentArrayList.add(student);
-//                Log.d("-----", "added student "+studentArrayList);
-//                mStudentAdapter.notifyDataSetChanged();
-//                ToastDisplay.displayToast(mContext, getString(R.string.Student_added));
-//            } else if (requestCode == Constants.REQUEST_CODE_EDIT) {
-//                int index = data.getIntExtra(StudentListActivity.EXTRA_INDEX, 0);
-//                Student previousStudent = studentArrayList.get(index);
-//                previousStudent.setName(student.getName());
-//                previousStudent.setRollNo(student.getRollNo());
-//                mStudentAdapter.notifyDataSetChanged();
-//                ToastDisplay.displayToast(mContext, getString(R.string.update_details));
-//            }
-//        }
-//    }
-//
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//
-//        MenuInflater menuInflater = getActivity().getMenuInflater();
-//        menuInflater.inflate(R.menu.menu_resource_file, menu);
-//        MenuItem item = menu.findItem(R.id.switchItem1);
-//        MenuItem sortByName = menu.findItem(R.id.sortByName);
-//        MenuItem sortByRollNo = menu.findItem(R.id.sortByRollNo);
-//        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mContext);
-//        rvStudents.setLayoutManager(linearLayoutManager);
-//        sortByName.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-//            @Override
-//            public boolean onMenuItemClick(MenuItem item) {
-//                Collections.sort(studentArrayList, new SortByName());
-//                mStudentAdapter.notifyDataSetChanged();
-//                ToastDisplay.displayToast(mContext, getString(R.string.Sorted_name));
-//                return true;
-//            }
-//        });
-//        sortByRollNo.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-//            @Override
-//            public boolean onMenuItemClick(MenuItem item) {
-//                Collections.sort(studentArrayList, new SortByRollNo());
-//                mStudentAdapter.notifyDataSetChanged();
-//                ToastDisplay.displayToast(mContext, getString(R.string.Sorted_RollNo));
-//                return true;
-//            }
-//        });
-//        item.setActionView(R.layout.switch_layout);
-//        Switch switchLayout = menu.findItem(R.id.switchItem1).getActionView().findViewById(R.id.switchFirst);
-//        switchLayout.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            @Override
-//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//                if (isChecked) {
-//                    rvStudents.setLayoutManager(new GridLayoutManager(mContext, 2));
-//                } else {
-//                    rvStudents.setLayoutManager(linearLayoutManager);
-//                }
-//            }
-//        });
-//        return super.onCreateOptionsMenu(menu);
-//    }
-
-
-
    private void viewMode(final Student student) {
        Intent intentView = new Intent(mContext, ViewStudentActivity.class);
-       intentView.putExtra(StudentListActivity.EXTRA_SELECTED_STUDENT, student);
-       intentView.putExtra(StudentListActivity.EXTRA_IS_FROM_VIEW, true);
+       intentView.putExtra(Constants.SELECTED_STUDENT, student);
+       intentView.putExtra(Constants.IS_FROM_VIEW, true);
        startActivity(intentView);
    }
 
     /**
-     * editMode creates intent to addstudentactivity to edit student info
-     * and save changes then startactivityresult takes intent and request code for edit
-     //     */
+     * editMode function send bundle to the activity through interface
+     * when edit option is selected
+     * @param position
+     */
    private void editMode(final int position) {
        mListener.callOtherFragToAdd();
        Bundle bundle=new Bundle();
        Student student=studentArrayList.get(position);
-//       int index = 0;
-//       for (int i = 0; i < studentArrayList.size(); i++) {
-//           if (studentArrayList.get(i).getRollNo() == student.getRollNo()) {
-//               index = i;
-//           }
-//       }
-       bundle.putParcelable(StudentListActivity.EXTRA_SELECTED_STUDENT, student);
-       bundle.putInt(StudentListActivity.EXTRA_INDEX, position);
-       bundle.putBoolean(StudentListActivity.EXTRA_IS_FROM_EDIT,true);
-//       bundle.putBoolean(StudentListActivity.EXTRA_IS_FROM_EDIT, true);
-//       bundle.putParcelableArrayList(StudentListActivity.EXTRA_STUDENT_LIST, studentArrayList);
-   //    mListener.communicateEditStudent(bundle);
+       bundle.putParcelable(Constants.SELECTED_STUDENT, student);
+       bundle.putInt(Constants.INDEX, position);
+       bundle.putBoolean(Constants.IS_FROM_EDIT,true);
        mListener.getMode(bundle);
        Log.d("----------", "editMode: " );
-//       mListener.callOtherFragToAdd();
 
    }
 }

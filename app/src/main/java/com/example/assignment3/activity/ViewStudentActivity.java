@@ -28,6 +28,7 @@ import com.example.assignment3.model.Student;
 import com.example.assignment3.service.BgAsync;
 import com.example.assignment3.service.BgIntentService;
 import com.example.assignment3.service.BgService;
+import com.example.assignment3.util.Constants;
 import com.example.assignment3.util.Validate;
 
 import java.util.ArrayList;
@@ -37,7 +38,6 @@ public class ViewStudentActivity extends AppCompatActivity implements Communicat
 
 
     private Bundle bundle;
-    private Intent intent;
     private AddStudentFragment studentFragment;
 
     @Override
@@ -52,15 +52,17 @@ public class ViewStudentActivity extends AppCompatActivity implements Communicat
     @Override
     protected void onStart() {
         super.onStart();
-        Student student = bundle.getParcelable(StudentListActivity.EXTRA_SELECTED_STUDENT);
+        Student student = bundle.getParcelable(Constants.SELECTED_STUDENT);
         Log.d("--------", "onStart: "+student.getName());
         studentFragment.viewStudent(student);
     }
 
+    /**
+     *
+     */
     private void init() {
 
         bundle = getIntent().getExtras();
-
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         studentFragment = new AddStudentFragment();

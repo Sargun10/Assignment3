@@ -11,6 +11,7 @@ import android.util.Log;
 import com.example.assignment3.fragment.AddStudentFragment;
 import com.example.assignment3.fragment.StudentListFragment;
 import com.example.assignment3.model.Student;
+import com.example.assignment3.util.Constants;
 
 import java.util.ArrayList;
 
@@ -26,27 +27,24 @@ ArrayList<Student> studentArrayList;
 
     @Override
     public Fragment getItem(int position) {
-        if (position == 0){
+        if (position == Constants.STUD_LIST_FRAG){
             Fragment fragment=new StudentListFragment();
             Bundle bundle=new Bundle();
-            bundle.putParcelableArrayList("studentList",studentArrayList);
+            bundle.putParcelableArrayList(Constants.BUNDLE_ARRAY_LIST,studentArrayList);
             fragment.setArguments(bundle);
-            Log.d("tttttttttttttt","ponmchhc g");
             return fragment;}
-        if (position == 1)
+        if (position == Constants.ADD_STUDENT_FRAG)
         {Fragment fragment=new AddStudentFragment();
             Bundle bundle=new Bundle();
-            bundle.putParcelableArrayList("studentList",studentArrayList);
+            bundle.putParcelableArrayList(Constants.BUNDLE_ARRAY_LIST,studentArrayList);
             fragment.setArguments(bundle);
-            Log.d("tttttttttttttt","ponmchhc g");
             return fragment;}
-//            return new AddStudentFragment();
         else return null;
     }
 
     @Override
     public int getCount() {
-        return 2;
+        return Constants.TOTAL_FRAG;
     }
 
 
