@@ -33,26 +33,26 @@ overloaded function to check unique roll no in array list on editing details of 
 @param index of the student in student array list to be left out while checking for unique
 @return boolean value if roll no is valid in listr or not
  */
-    public boolean uniqueValidation(ArrayList<Student> studentArrayList,String rollNo,int index){
-        boolean isRollNoUnique=true;
-        Log.d("-----------", "uniqueValidation: "+index);
-        int pos=0;
-        for(Student student:studentArrayList){
-            if(pos==index){
-                pos++;
-                continue;
-            }
-            if(student.getRollNo().equals(rollNo)){
-                    isRollNoUnique=false;
-                    break;
-                }
-                pos++;
-
-
-        }Log.d("-----------", "uniqueValidation: "+isRollNoUnique);
-        return isRollNoUnique;
-
-    }
+//    public boolean uniqueValidation(ArrayList<Student> studentArrayList,String rollNo,int index){
+//        boolean isRollNoUnique=true;
+//        Log.d("-----------", "uniqueValidation: "+index);
+//        int pos=0;
+//        for(Student student:studentArrayList){
+//            if(pos==index){
+//                pos++;
+//                continue;
+//            }
+//            if(student.getRollNo().equals(rollNo)){
+//                    isRollNoUnique=false;
+//                    break;
+//                }
+//                pos++;
+//
+//
+//        }Log.d("-----------", "uniqueValidation: "+isRollNoUnique);
+//        return isRollNoUnique;
+//
+//    }
 /*
 to check if name has only alphabets
  */

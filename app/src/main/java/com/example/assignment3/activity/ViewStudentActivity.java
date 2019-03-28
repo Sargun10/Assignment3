@@ -33,7 +33,7 @@ import com.example.assignment3.util.Validate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewStudentActivity extends AppCompatActivity  {
+public class ViewStudentActivity extends AppCompatActivity implements CommunicationFragments {
 
 
     private Bundle bundle;
@@ -53,6 +53,7 @@ public class ViewStudentActivity extends AppCompatActivity  {
     protected void onStart() {
         super.onStart();
         Student student = bundle.getParcelable(StudentListActivity.EXTRA_SELECTED_STUDENT);
+        Log.d("--------", "onStart: "+student.getName());
         studentFragment.viewStudent(student);
     }
 
@@ -63,18 +64,28 @@ public class ViewStudentActivity extends AppCompatActivity  {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         studentFragment = new AddStudentFragment();
-        fragmentTransaction.add(R.id.myContainer, studentFragment, "");
+        fragmentTransaction.add(R.id.fragView, studentFragment, "");
         fragmentTransaction.commit();
 
     }
 
-//    @Override
-//    public void addData() {
-//
-//    }
+    @Override
+    public void communicateAddStudent(Student student) {
 
-//    @Override
-//    public void editData(int position) {
-//
-//    }
+    }
+
+    @Override
+    public void communicateEditStudent(Bundle bundle) {
+
+    }
+
+    @Override
+    public void callOtherFragToAdd() {
+
+    }
+
+    @Override
+    public void getMode(Bundle bundle) {
+
+    }
 }

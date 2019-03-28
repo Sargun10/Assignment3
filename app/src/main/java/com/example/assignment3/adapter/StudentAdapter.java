@@ -51,7 +51,7 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentV
  */
     @Override
     public void onBindViewHolder(@NonNull StudentViewHolder viewHolder, int i) {
-
+       if(studentsArrayList.get(i)==null) Log.d("-----------", "onBindViewHolder: "+i);
         viewHolder.textViewName2.setText(studentsArrayList.get(i).getName());
         viewHolder.textViewRollno2.setText(studentsArrayList.get(i).getRollNo());
 

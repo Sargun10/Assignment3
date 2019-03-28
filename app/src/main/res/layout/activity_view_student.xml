@@ -6,52 +6,12 @@
     android:layout_height="match_parent"
     android:id="@+id/myContainer"
     tools:context=".activity.ViewStudentActivity">
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/fragView">
 
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/padding"
-        android:layout_alignParentTop="true"
-
-        android:src="@mipmap/ic_launcher"
-
-        />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/editTextName"
-        android:layout_toEndOf="@+id/textViewName"
-        android:layout_below="@+id/imageView2"
-        android:hint="Enter Name"
-        android:layout_marginTop="@dimen/marginTop"
-        android:textSize="@dimen/fontSize"
-        android:padding="@dimen/paddingEt"
-        android:layout_toRightOf="@+id/textViewName" />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/editTextRollNo"
-        android:layout_below="@+id/editTextName"
-        android:layout_marginTop="@dimen/marginTop"
-        android:hint="Enter Roll no."
-        android:inputType="number"
-        android:textSize="@dimen/fontSize"
-        android:padding="@dimen/paddingEt"
-         />
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/buttonSave"
-        android:text="Save"
-        android:layout_alignParentBottom="true"
-        android:onClick="onClickSave"
-        />
-
-
+</RelativeLayout>
 
 
 

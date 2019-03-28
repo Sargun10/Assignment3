@@ -36,6 +36,7 @@ public class BgService extends Service {
                 break;
             case StudentListActivity.EXTRA_IS_FROM_EDIT:
                 dbHelper = new DbHelper(this);
+                Log.d("--------", "onStartCommand: update query service");
                 dbHelper.updateQuery(student,previousRollNo);
                 break;
             case StudentListActivity.EXTRA_IS_FROM_DELETE:

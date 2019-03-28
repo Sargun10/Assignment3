@@ -39,10 +39,10 @@ public class StudentListActivity extends AppCompatActivity implements Communicat
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_list);
-        DbHelper dbHelper=new DbHelper(this);
+        DbHelper dbHelper = new DbHelper(this);
         //  dbHelper.createTable();
 
-        studentArrayList=dbHelper.getAllStudents();
+        studentArrayList = dbHelper.getAllStudents();
         viewPager = findViewById(R.id.viewPager);
         tabLayout = findViewById(R.id.tabLayout);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -54,17 +54,15 @@ public class StudentListActivity extends AppCompatActivity implements Communicat
 
             @Override
             public void onPageSelected(int i) {
-                BaseFragment fragment=(BaseFragment) StudentListActivity.this.getSupportFragmentManager().getFragments().get(i);
+                BaseFragment fragment = (BaseFragment) StudentListActivity.this.getSupportFragmentManager().getFragments().get(i);
                 Bundle bundle;
-                if(fragment.getArguments()!=null){
-                    bundle=fragment.getArguments();
+                if (fragment.getArguments() != null) {
+                    bundle = fragment.getArguments();
 
+                } else {
+                    bundle = new Bundle();
                 }
-                else {
-                    bundle=new Bundle();
-
-                }
-                bundle.putParcelableArrayList(BUNDLE_ARRAY_LIST,studentArrayList);
+                bundle.putParcelableArrayList(BUNDLE_ARRAY_LIST, studentArrayList);
                 fragment.setArguments(bundle);
                 Log.d("----------", "onPageSelected: ");
                 fragment.refresh();
@@ -83,6 +81,16 @@ public class StudentListActivity extends AppCompatActivity implements Communicat
 
     }
 
+    @Override
+    public void onBackPressed() {
+        if(viewPager.getCurrentItem()>=1){
+            viewPager.setCurrentItem(viewPager.getCurrentItem()-1);
+        }
+        else {
+            super.onBackPressed();
+        }
+    }
+
     public void changeTab() {
         if (viewPager.getCurrentItem() == 0) {
             viewPager.setCurrentItem(1);
@@ -92,25 +100,12 @@ public class StudentListActivity extends AppCompatActivity implements Communicat
     }
 
     private void setViewPager(ViewPager viewPager) {
-        MyPagerAdapter myPagerAdapter = new MyPagerAdapter(getSupportFragmentManager(),studentArrayList);
+        MyPagerAdapter myPagerAdapter = new MyPagerAdapter(getSupportFragmentManager(), studentArrayList);
 
         viewPager.setAdapter(myPagerAdapter);
     }
-
-//    @Override
-//    public void communicateAddList(Bundle bundle) {
-////        String tag =getString(R.string.tag)+R.id.viewPager+":"+0;
-////        studentArrayList=bundle.getParcelableArrayList("studentList");
-////        Fragment fragment=this.getSupportFragmentManager().getFragments().get(ADD_STUDENT_FRAG);
-////        fragment.setArguments(bundle);
-////        changeTab();
-//    }
-
     @Override
     public void communicateAddStudent(Student student) {
-//        String tag =getString(R.string.tag)+R.id.viewPager+":"+1;
-////        AddStudentFragment addStudentFragment = (AddStudentFragment) getSupportFragmentManager().findFragmentByTag(tag);
-////        addStudentFragment.updateStudentDetails(bundle);
         studentArrayList.add(student);
         Log.d("h", "communicateAddStudent: ");
         changeTab();
@@ -118,7 +113,16 @@ public class StudentListActivity extends AppCompatActivity implements Communicat
 
     @Override
     public void communicateEditStudent(Bundle bundle) {
-        studentArrayList=bundle.getParcelableArrayList(EXTRA_STUDENT_LIST);
+        studentArrayList=bundle.getParcelableArrayList(BUNDLE_ARRAY_LIST);
+        Student student = bundle.getParcelable(EXTRA_SELECTED_STUDENT);
+        int index = bundle.getInt(EXTRA_INDEX);
+        Log.d("aaaaaaaaa", "communicateEditStudent: "+studentArrayList.size());
+        Log.d("aaaaaaaaaa", "communicateEditStudent: "+index);
+
+        studentArrayList.remove(index);
+        Log.d("aaaaaaaaaa", "communicateEditStudent: "+studentArrayList.size());
+
+        studentArrayList.add(index, student);
         changeTab();
     }
 
@@ -130,66 +134,13 @@ public class StudentListActivity extends AppCompatActivity implements Communicat
 
     @Override
     public void getMode(Bundle bundle) {
-        if(bundle.getBoolean(StudentListActivity.EXTRA_IS_FROM_EDIT)){
-            String tag = "android:switcher:" + R.id.viewPager + ":" + 1;
-            int position=bundle.getInt(StudentListActivity.EXTRA_INDEX,-1);
-            Student student=studentArrayList.get(position);
-            bundle.putParcelable(StudentListActivity.EXTRA_SELECTED_STUDENT,student);
-            BaseFragment addStudentFragment=(BaseFragment) StudentListActivity.this.getSupportFragmentManager().getFragments().get(ADD_STUDENT_FRAG);
-            if(addStudentFragment==null)Log.d("hhhhhhhhhhh", "getMode: ");
-            addStudentFragment.setArguments(bundle);
-            callOtherFragToAdd();
-
+        String tag = "android:switcher:" + R.id.viewPager + ":" + 1;
+        AddStudentFragment addStudentFragment = (AddStudentFragment) getSupportFragmentManager().getFragments().get(1);
+        if (addStudentFragment != null) {
+            addStudentFragment.getMode(bundle);
+            studentArrayList = bundle.getParcelableArrayList(BUNDLE_ARRAY_LIST);
         }
-
-//
-//        if (addStudentFragment != null) {
-//           addStudentFragment.getMode(bundle);
-//            Log.d("h", "getModd:   "+bundle.getBoolean(StudentListActivity.EXTRA_IS_FROM_ADD)+ " "+bundle.getBoolean(StudentListActivity.EXTRA_IS_FROM_EDIT));
-//           changeTab();
-//        }
     }
-
-//    public void showData() {
-//        getSupportFragmentManager().findFragmentByTag("Add Student");
-//    }
-//
-//    @Override
-//    public void addData(Bundle bundle) {
-////        String tag = "android:switcher:" + R.id.viewPager + ":" + 0;
-////        AddStudentFragment addStudentFragment = (AddStudentFragment) getSupportFragmentManager().findFragmentByTag(tag);
-////        if (addStudentFragment != null) {
-////            addStudentFragment.addStudent(bundle);
-////            changeTab();
-////        }
-//
-//    }
-//
-//    @Override
-//    public void editData(Bundle bundle) {
-//        String tag = "android:switcher:" + R.id.viewPager + ":" + 1;
-//        AddStudentFragment addStudentFragment = (AddStudentFragment) getSupportFragmentManager().findFragmentByTag(tag);
-//        if (addStudentFragment != null) {
-//            addStudentFragment.editStudent(bundle);
-//            changeTab();
-//        }
-//    }
-
-
-//    @Override
-//    public void addData() {
-//        viewPager.setCurrentItem(ADD_STUDENT_FRAG);
-//    }
-
-
-
-//    @Override
-//    public void updateData() {
-////        viewPager.getAdapter().notifyDataSetChanged();
-////        viewPager.setCurrentItem(STUD_LIST_FRAG);
-//
-//
-//    }
 }
 
 

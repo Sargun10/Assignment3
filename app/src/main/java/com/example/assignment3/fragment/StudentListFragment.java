@@ -180,10 +180,13 @@ public class StudentListFragment extends BaseFragment{
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.callOtherFragToAdd();
                 Bundle bundle=new Bundle();
-//                bundle.putString(StudentListActivity.EXTRA_IS_FROM_ADD,);
-//                mListener.getMode(bundle);
+                bundle.putBoolean(StudentListActivity.EXTRA_IS_FROM_ADD,true);
+                bundle.putParcelableArrayList(StudentListActivity.BUNDLE_ARRAY_LIST,studentArrayList);
+                StudentListFragment.this.setArguments(bundle);
+                mListener.callOtherFragToAdd();
+                mListener.getMode(bundle);
+
             }
         });
 
@@ -279,14 +282,16 @@ public class StudentListFragment extends BaseFragment{
      * and save changes then startactivityresult takes intent and request code for edit
      //     */
    private void editMode(final int position) {
-//       bundle.putParcelable(StudentListActivity.EXTRA_SELECTED_STUDENT, student);
+       mListener.callOtherFragToAdd();
        Bundle bundle=new Bundle();
+       Student student=studentArrayList.get(position);
 //       int index = 0;
 //       for (int i = 0; i < studentArrayList.size(); i++) {
 //           if (studentArrayList.get(i).getRollNo() == student.getRollNo()) {
 //               index = i;
 //           }
 //       }
+       bundle.putParcelable(StudentListActivity.EXTRA_SELECTED_STUDENT, student);
        bundle.putInt(StudentListActivity.EXTRA_INDEX, position);
        bundle.putBoolean(StudentListActivity.EXTRA_IS_FROM_EDIT,true);
 //       bundle.putBoolean(StudentListActivity.EXTRA_IS_FROM_EDIT, true);
