@@ -28,4 +28,5 @@ public interface CommunicationFragments {
      * @param bundle
      */
     public void getMode(Bundle bundle);
+    public void refreshStudent();
 }

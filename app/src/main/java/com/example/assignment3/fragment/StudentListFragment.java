@@ -53,7 +53,7 @@ import static android.app.Activity.RESULT_OK;
  */
 public class StudentListFragment extends BaseFragment{
     private CommunicationFragments mListener;
-    private ArrayList<Student> studentArrayList = new ArrayList<>();
+    private ArrayList<Student> studentArrayList;
     private StudentAdapter mStudentAdapter;
     private Context mContext;
     public RecyclerView rvStudents;
@@ -79,6 +79,7 @@ public class StudentListFragment extends BaseFragment{
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        studentArrayList= new ArrayList<>();
         super.onCreate(savedInstanceState);
     }
 
@@ -88,7 +89,7 @@ public class StudentListFragment extends BaseFragment{
         initViews(view);
         setHasOptionsMenu(true);
         mContext = getActivity();
-        studentArrayList=getArguments().getParcelableArrayList(Constants.BUNDLE_ARRAY_LIST);
+        //studentArrayList=getArguments().getParcelableArrayList(Constants.BUNDLE_ARRAY_LIST);
         mStudentAdapter = new StudentAdapter(studentArrayList, mContext);
         rvStudents.setAdapter(mStudentAdapter);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(mContext.getApplicationContext());
@@ -187,7 +188,7 @@ public class StudentListFragment extends BaseFragment{
     @Override
     public void refresh() {
 
-       // studentArrayList = getArguments().getParcelableArrayList("studentList");
+        studentArrayList = getArguments().getParcelableArrayList(Constants.BUNDLE_ARRAY_LIST);
 
 
     }
@@ -268,5 +269,8 @@ public class StudentListFragment extends BaseFragment{
        mListener.getMode(bundle);
        Log.d("----------", "editMode: " );
 
+   }
+   public void notifyAddedList(){
+       mStudentAdapter.notifyDataSetChanged();
    }
 }

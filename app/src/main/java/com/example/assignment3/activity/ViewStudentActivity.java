@@ -90,4 +90,9 @@ public class ViewStudentActivity extends AppCompatActivity implements Communicat
     public void getMode(Bundle bundle) {
 
     }
+
+    @Override
+    public void refreshStudent() {
+
+    }
 }

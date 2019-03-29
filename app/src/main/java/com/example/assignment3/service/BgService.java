@@ -21,9 +21,9 @@ public class BgService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        DbHelper dbHelper= new DbHelper(this);
         intent.setAction(Constants.SERVICE_FILTER_ACTION_KEY);
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-        DbHelper dbHelper;
         String previousRollNo = new String();
         if(intent.hasExtra(Constants.PREVIOUS_STUDENT_ID)) {
             previousRollNo = intent.getStringExtra(Constants.PREVIOUS_STUDENT_ID);
@@ -33,16 +33,13 @@ public class BgService extends Service {
         Student student = intent.getParcelableExtra(Constants.PRESENT_STUDENT);
         switch (mode) {
             case Constants.IS_FROM_ADD:
-                dbHelper= new DbHelper(this);
                 dbHelper.insertQuery(student);
                 break;
             case Constants.IS_FROM_EDIT:
-                dbHelper = new DbHelper(this);
                 Log.d("--------", "onStartCommand: update query service");
                 dbHelper.updateQuery(student,previousRollNo);
                 break;
             case Constants.IS_FROM_DELETE:
-                dbHelper = new DbHelper(this);
                 dbHelper.deleteQuery(student);
                 break;
         }

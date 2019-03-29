@@ -24,6 +24,7 @@ public class StudentListActivity extends AppCompatActivity implements Communicat
     private ViewPager viewPager;
     private TabLayout tabLayout;
     private ArrayList<Student> studentArrayList ;
+    AddStudentFragment addStudentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +47,7 @@ public class StudentListActivity extends AppCompatActivity implements Communicat
                 Bundle bundle = new Bundle();
                 bundle.putBoolean(Constants.IS_FROM_ADD,true);
                 bundle.putParcelableArrayList(Constants.BUNDLE_ARRAY_LIST,studentArrayList);
-                AddStudentFragment addStudentFragment = (AddStudentFragment) getSupportFragmentManager().getFragments().get(1);
+                addStudentFragment = (AddStudentFragment) getSupportFragmentManager().getFragments().get(1);
                 Log.d("----", "onPageScrollStateChanged: "+ "here");
                 if (addStudentFragment != null) {
                     addStudentFragment.getMode(bundle);
@@ -72,6 +73,7 @@ public class StudentListActivity extends AppCompatActivity implements Communicat
     public void onBackPressed() {
         if(viewPager.getCurrentItem()>=1){
             viewPager.setCurrentItem(viewPager.getCurrentItem()-1);
+            addStudentFragment.clearFields();
         }
         else {
             super.onBackPressed();
@@ -109,9 +111,9 @@ public class StudentListActivity extends AppCompatActivity implements Communicat
         studentArrayList=bundle.getParcelableArrayList(Constants.BUNDLE_ARRAY_LIST);
         Student student = bundle.getParcelable(Constants.SELECTED_STUDENT);
         int index = bundle.getInt(Constants.INDEX);
-        Log.d("----------", "communicateEditStudent: "+index);
+        Log.d("----------", "communicateEditStudent: "+student.getName());
         studentArrayList.remove(index);
-        studentArrayList.add(index, student);
+        studentArrayList.add(index,student);
         changeTab();
     }
 
@@ -127,6 +129,14 @@ public class StudentListActivity extends AppCompatActivity implements Communicat
             addStudentFragment.getMode(bundle);
             studentArrayList = bundle.getParcelableArrayList(Constants.BUNDLE_ARRAY_LIST);
         }
+    }
+
+    @Override
+    public void refreshStudent() {
+        StudentListFragment studentListFragment = new StudentListFragment();
+        studentListFragment.notifyAddedList();
+        changeTab();
+
     }
 }
 

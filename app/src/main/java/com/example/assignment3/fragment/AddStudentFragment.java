@@ -92,6 +92,7 @@ public class AddStudentFragment extends BaseFragment {
         View view = inflater.inflate(R.layout.fragment_add_student, container, false);
         initViews(view);
        // addStudent();
+        refresh();
         return view;
     }
 
@@ -109,13 +110,14 @@ public class AddStudentFragment extends BaseFragment {
 
     }
 
+
     public void getMode(Bundle bundle) {
         mSelectedPosition = bundle.getInt(Constants.INDEX, -1);
         mIsFromAdd = bundle.getBoolean(Constants.IS_FROM_ADD, false);
         mIsFromEdit = bundle.getBoolean(Constants.IS_FROM_EDIT, false);
-        if (mIsFromAdd) {
-            clearFields();
-        }
+//        if (mIsFromAdd) {
+//            clearFields();
+//        }
         if (mIsFromEdit) {
             student = bundle.getParcelable(Constants.SELECTED_STUDENT);
             getDataFromEditTexts(student);
@@ -125,8 +127,8 @@ public class AddStudentFragment extends BaseFragment {
      * on click of save button data is fetched from edit text and validations are applied
      * string name should not be null and has only alphabets
      * roll number must be unique
-     * in case of edit index is checked and fetched and then intent is fired
-     * in case of adding a student only validations are done
+     *
+     * in case of adding a student validations are done
      */
 
     public void handleEvents() {
@@ -147,6 +149,7 @@ public class AddStudentFragment extends BaseFragment {
                             editTextRollNo.setError(getString(R.string.Valid_RollNo));
                         } else {
 //                            clearFields();
+                            editTextRollNo.setEnabled(true);
                             Student student = new Student(name, rollNo);
                             editTextName.setFocusable(false);
                             editTextRollNo.setFocusable(false);
@@ -160,13 +163,8 @@ public class AddStudentFragment extends BaseFragment {
                     }
                         else {
                         Log.d("---------", "mIsFromEditttttttt "+student);
-//                            getDataFromEditTexts(student);
-                            editTextName.setEnabled(false);
-                            editTextRollNo.setEnabled(false);
                             Student newstudent = new Student(name, rollNo);
                             serviceDialogBox(newstudent, Constants.IS_FROM_EDIT,student.getRollNo());
-                            editTextName.setEnabled(true);
-                            editTextRollNo.setEnabled(true);
                             Bundle bundle = new Bundle();
                             bundle.putInt(Constants.INDEX, mSelectedPosition);
                             bundle.putParcelable(Constants.SELECTED_STUDENT, student);
@@ -197,18 +195,18 @@ public class AddStudentFragment extends BaseFragment {
     }
 
     /**
-     * on click of save button data is fetched from edit text and validations are applied
-     * string name should not be null and has only alphabets
-     * roll number must be unique
-     * in case of edit index is checked and fetched and then intent is fired
-     * in case of adding a student only validations are done
+     * this displays service dialog box as to what bg service to use to save data
+     * @param presentStudent
+     * @param mode
+     * @param previousStudentPosition
      */
-
     public void serviceDialogBox(final Student presentStudent, final String mode, final String previousStudentPosition) {
 
         final String[] items = {"Services", "Intent Services", "Async Task"};
         final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         builder.setTitle("Select Option to save student details");
+        editTextName.setEnabled(true);
+        editTextRollNo.setEnabled(true);
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -224,6 +222,7 @@ public class AddStudentFragment extends BaseFragment {
                         if(mIsFromAdd){
                             Log.d("----------", "onClick: "+presentStudent.getName());
                             mListener.communicateAddStudent(presentStudent);
+                            mListener.callOtherFragToAdd();
                         }
                         else if(mIsFromEdit){
                             Log.d("aaaaaaa", "onClick: "+mode);
@@ -231,7 +230,6 @@ public class AddStudentFragment extends BaseFragment {
                             bundle.putParcelable(Constants.SELECTED_STUDENT, presentStudent);
                             mListener.communicateEditStudent(bundle);
                         }
-//                        getActivity().finish();
                         break;
                     case 1:
                         Intent iSIntent = new Intent(mContext, BgIntentService.class);
@@ -241,6 +239,7 @@ public class AddStudentFragment extends BaseFragment {
                         getActivity().startService(iSIntent);
                         if(mIsFromAdd){
                             mListener.communicateAddStudent(presentStudent);
+                            mListener.callOtherFragToAdd();
                         }
                         else if(mIsFromEdit){
                         Log.d("aaaaaaa", "onClick: "+mode);
@@ -254,14 +253,14 @@ public class AddStudentFragment extends BaseFragment {
                         bgAsync.execute(presentStudent, mode, previousStudentPosition);
                         if(mIsFromAdd){
                             mListener.communicateAddStudent(presentStudent);
+                            mListener.callOtherFragToAdd();
                         }
                         else if(mIsFromEdit){
                         Log.d("aaaaaaa", "onClick: "+mode);
-                            bundle.putInt(Constants.INDEX,mSelectedPosition);
+                        bundle.putInt(Constants.INDEX,mSelectedPosition);
                         bundle.putParcelable(Constants.SELECTED_STUDENT, presentStudent);
                         mListener.communicateEditStudent(bundle);
                     }
-//                        getActivity().finish();
                         break;
                 }
 
@@ -309,7 +308,6 @@ public class AddStudentFragment extends BaseFragment {
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(Constants.SERVICE_FILTER_ACTION_KEY) || intent.getAction().equals(Constants.INTENT_SERVICE_FILTER_ACTION_KEY)) {
                 mAlert.dismiss();
-                //getActivity().finish();
             }
         }
     }
