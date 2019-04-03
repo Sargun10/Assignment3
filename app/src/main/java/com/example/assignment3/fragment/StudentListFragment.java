@@ -51,7 +51,7 @@ import static android.app.Activity.RESULT_OK;
  * <p>
  * create an instance of this fragment.
  */
-public class StudentListFragment extends BaseFragment{
+public class StudentListFragment extends Fragment{
     private CommunicationFragments mListener;
     private ArrayList<Student> studentArrayList;
     private StudentAdapter mStudentAdapter;
@@ -89,7 +89,7 @@ public class StudentListFragment extends BaseFragment{
         initViews(view);
         setHasOptionsMenu(true);
         mContext = getActivity();
-        //studentArrayList=getArguments().getParcelableArrayList(Constants.BUNDLE_ARRAY_LIST);
+        studentArrayList=getArguments().getParcelableArrayList(Constants.BUNDLE_ARRAY_LIST);
         mStudentAdapter = new StudentAdapter(studentArrayList, mContext);
         rvStudents.setAdapter(mStudentAdapter);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(mContext.getApplicationContext());
@@ -113,7 +113,7 @@ public class StudentListFragment extends BaseFragment{
                 bundle.putBoolean(Constants.IS_FROM_ADD,true);
                 bundle.putParcelableArrayList(Constants.BUNDLE_ARRAY_LIST,studentArrayList);
                 StudentListFragment.this.setArguments(bundle);
-                mListener.callOtherFragToAdd();
+                mListener.changeFragTab();
                 mListener.getMode(bundle);
 
             }
@@ -153,7 +153,7 @@ public class StudentListFragment extends BaseFragment{
                                                 dbHelper.deleteQuery(studentArrayList.get(position));
                                                 studentArrayList.remove(position);
                                                 mStudentAdapter.notifyDataSetChanged();
-                                                ToastDisplay.displayToast(mContext, getString(R.string.Student_deleted));
+                                                ToastDisplay.displayToast(mContext, getString(R.string.student_deleted));
                                                 break;
 
                                             case DialogInterface.BUTTON_NEGATIVE:
@@ -163,8 +163,8 @@ public class StudentListFragment extends BaseFragment{
                                     }
                                 };
                                 AlertDialog.Builder ab = new AlertDialog.Builder(mContext);
-                                ab.setMessage(getString(R.string.Delete_confirm)).setPositiveButton(getString(R.string.Yes), dialogClickListener)
-                                        .setNegativeButton(getString(R.string.No), dialogClickListener).show();
+                                ab.setMessage(getString(R.string.delete_confirm)).setPositiveButton(getString(R.string.yes), dialogClickListener)
+                                        .setNegativeButton(getString(R.string.no), dialogClickListener).show();
                                 break;
                         }
                     }
@@ -184,15 +184,6 @@ public class StudentListFragment extends BaseFragment{
         super.onDetach();
         mListener = null;
     }
-
-    @Override
-    public void refresh() {
-
-        studentArrayList = getArguments().getParcelableArrayList(Constants.BUNDLE_ARRAY_LIST);
-
-
-    }
-
     /**
      * to create options menu for the activity that has two functions
      * to show data in grid or list view
@@ -214,7 +205,7 @@ public class StudentListFragment extends BaseFragment{
             public boolean onMenuItemClick(MenuItem item) {
                 Collections.sort(studentArrayList, new SortByName());
                 mStudentAdapter.notifyDataSetChanged();
-                ToastDisplay.displayToast(mContext, getString(R.string.Sorted_name));
+                ToastDisplay.displayToast(mContext, getString(R.string.sorted_name));
                 return true;
             }
         });
@@ -223,7 +214,7 @@ public class StudentListFragment extends BaseFragment{
             public boolean onMenuItemClick(MenuItem item) {
                 Collections.sort(studentArrayList, new SortByRollNo());
                 mStudentAdapter.notifyDataSetChanged();
-                ToastDisplay.displayToast(mContext, getString(R.string.Sorted_RollNo));
+                ToastDisplay.displayToast(mContext, getString(R.string.sorted_RollNo));
                 return true;
             }
         });
@@ -260,14 +251,13 @@ public class StudentListFragment extends BaseFragment{
      * @param position
      */
    private void editMode(final int position) {
-       mListener.callOtherFragToAdd();
+       mListener.changeFragTab();
        Bundle bundle=new Bundle();
        Student student=studentArrayList.get(position);
        bundle.putParcelable(Constants.SELECTED_STUDENT, student);
        bundle.putInt(Constants.INDEX, position);
        bundle.putBoolean(Constants.IS_FROM_EDIT,true);
        mListener.getMode(bundle);
-       Log.d("----------", "editMode: " );
 
    }
    public void notifyAddedList(){

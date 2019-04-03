@@ -1,9 +1,7 @@
 package com.example.assignment3.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -13,7 +11,6 @@ import com.example.assignment3.adapter.MyPagerAdapter;
 import com.example.assignment3.communicator.CommunicationFragments;
 import com.example.assignment3.database.DbHelper;
 import com.example.assignment3.fragment.AddStudentFragment;
-import com.example.assignment3.fragment.BaseFragment;
 import com.example.assignment3.fragment.StudentListFragment;
 import com.example.assignment3.model.Student;
 import com.example.assignment3.util.Constants;
@@ -25,6 +22,7 @@ public class StudentListActivity extends AppCompatActivity implements Communicat
     private TabLayout tabLayout;
     private ArrayList<Student> studentArrayList ;
     AddStudentFragment addStudentFragment;
+    StudentListFragment studentListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,9 +46,9 @@ public class StudentListActivity extends AppCompatActivity implements Communicat
                 bundle.putBoolean(Constants.IS_FROM_ADD,true);
                 bundle.putParcelableArrayList(Constants.BUNDLE_ARRAY_LIST,studentArrayList);
                 addStudentFragment = (AddStudentFragment) getSupportFragmentManager().getFragments().get(1);
-                Log.d("----", "onPageScrollStateChanged: "+ "here");
                 if (addStudentFragment != null) {
                     addStudentFragment.getMode(bundle);
+                    addStudentFragment.scrolled();
                 }
 //                if(i==1){
 //                    addStudentFragment.clearFields();
@@ -88,8 +86,6 @@ public class StudentListActivity extends AppCompatActivity implements Communicat
         if (viewPager.getCurrentItem() == 0) {
             viewPager.setCurrentItem(1);
         } else if (viewPager.getCurrentItem() == 1) {
-            AddStudentFragment addStudentFragment = (AddStudentFragment) getSupportFragmentManager().getFragments().get(1);
-            addStudentFragment.clearFields();
             viewPager.setCurrentItem(0);
         }
     }
@@ -111,14 +107,16 @@ public class StudentListActivity extends AppCompatActivity implements Communicat
         studentArrayList=bundle.getParcelableArrayList(Constants.BUNDLE_ARRAY_LIST);
         Student student = bundle.getParcelable(Constants.SELECTED_STUDENT);
         int index = bundle.getInt(Constants.INDEX);
-        Log.d("----------", "communicateEditStudent: "+student.getName());
+        Log.d("----------", "communicateEditStudent: "+index);
         studentArrayList.remove(index);
         studentArrayList.add(index,student);
+
+        studentListFragment = (StudentListFragment) getSupportFragmentManager().getFragments().get(0);
         changeTab();
     }
 
     @Override
-    public void callOtherFragToAdd() {
+    public void changeFragTab() {
         changeTab();
     }
 
@@ -127,7 +125,9 @@ public class StudentListActivity extends AppCompatActivity implements Communicat
         AddStudentFragment addStudentFragment = (AddStudentFragment) getSupportFragmentManager().getFragments().get(1);
         if (addStudentFragment != null) {
             addStudentFragment.getMode(bundle);
+            Log.d("aaaaaaaaaaaa", "getMode: "+studentArrayList);
             studentArrayList = bundle.getParcelableArrayList(Constants.BUNDLE_ARRAY_LIST);
+            addStudentFragment.scrolled();
         }
     }
 

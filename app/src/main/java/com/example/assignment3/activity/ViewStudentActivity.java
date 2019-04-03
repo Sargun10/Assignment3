@@ -82,7 +82,7 @@ public class ViewStudentActivity extends AppCompatActivity implements Communicat
     }
 
     @Override
-    public void callOtherFragToAdd() {
+    public void changeFragTab() {
 
     }
 

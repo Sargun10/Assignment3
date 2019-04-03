@@ -50,6 +50,8 @@ public class BgIntentService extends IntentService {
             case Constants.IS_FROM_DELETE:
                 dbHelper.deleteQuery(student);
                 break;
+            default:
+                break;
         }
     }
 

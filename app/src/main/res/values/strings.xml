@@ -1,26 +1,22 @@
 <resources>
     <string name="app_name">Student Management</string>
-    <string name="RollNo">RollNo</string>
-    <string name="View">View</string>
-    <string name="Edit">Edit</string>
+    <string name="rollNo">RollNo</string>
+    <string name="view">View</string>
+    <string name="edit">Edit</string>
     <string name="stuArr">stuArr</string>
-    <string name="Name1">Name</string>
-    <string name="Name2">Name</string>
-    <string name="Name3">Name</string>
-    <string name="RollNo1">RollNo</string>
-    <string name="Name">Name</string>
-    <string name="Student_added">Student added !!</string>
+    <string name="name">Name</string>
+    <string name="student_added">Student added !!</string>
     <string name="update_details">Student details updated !!</string>
-    <string name="Sorted_name">Sorted By Name !</string>
-    <string name="Sorted_RollNo">Sorted By Roll No !</string>
-    <string name="Student_deleted">student record deleted !!</string>
-    <string name="Delete_confirm">Are you sure to delete?</string>
-    <string name="Yes">Yes</string>
-    <string name="No">No</string>
-    <string name="Save_changes">Save Changes</string>
-    <string name="Valid_name">enter valid name</string>
-    <string name="Valid_RollNo">Not a valid Roll Number</string>
-    <string name="Valid_Roll_No">enter valid roll no</string>
+    <string name="sorted_name">Sorted By Name !</string>
+    <string name="sorted_RollNo">Sorted By Roll No !</string>
+    <string name="student_deleted">student record deleted !!</string>
+    <string name="delete_confirm">Are you sure to delete?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="valid_name">enter valid name</string>
+    <string name="valid_RollNo">Not a valid Roll Number</string>
+    <string name="valid_Roll_No">enter valid roll no</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

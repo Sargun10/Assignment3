@@ -32,7 +32,6 @@ public class BgAsync extends AsyncTask<Object,Void,Void> {
                 db.close();
                 break;
             case Constants.IS_FROM_EDIT:
-
                 db=dbHelper.getWritableDatabase();
                 dbHelper.updateQuery(student,previousStudentId);
                 db.close();

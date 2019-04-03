@@ -21,7 +21,7 @@ public interface CommunicationFragments {
     /**
      * this function is to change tab after the student has been added or edited
      */
-    public void callOtherFragToAdd();
+    public void changeFragTab();
 
     /**
      * this function is get mode in activity whether student is added or edited

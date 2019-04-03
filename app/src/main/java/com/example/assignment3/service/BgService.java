@@ -23,7 +23,6 @@ public class BgService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         DbHelper dbHelper= new DbHelper(this);
         intent.setAction(Constants.SERVICE_FILTER_ACTION_KEY);
-        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
         String previousRollNo = new String();
         if(intent.hasExtra(Constants.PREVIOUS_STUDENT_ID)) {
             previousRollNo = intent.getStringExtra(Constants.PREVIOUS_STUDENT_ID);
@@ -42,7 +41,10 @@ public class BgService extends Service {
             case Constants.IS_FROM_DELETE:
                 dbHelper.deleteQuery(student);
                 break;
+            default:
+                break;
         }
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
         return START_NOT_STICKY;
     }
 
