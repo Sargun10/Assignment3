@@ -15,10 +15,13 @@ import com.example.assignment3.util.Constants;
 
 import java.util.ArrayList;
 
+/**
+ * pager Adapter for view pager for two fragments one displasys studentr list and another is tro enter and edit studfent detyails.
+ */
 public class MyPagerAdapter extends FragmentStatePagerAdapter {
 
     private String[] titles = {"Students", "Add/Edit"};
-ArrayList<Student> studentArrayList;
+    private ArrayList<Student> studentArrayList;
     public MyPagerAdapter(FragmentManager fm,ArrayList<Student> studentArrayList) {
         super(fm);
         this.studentArrayList=studentArrayList;

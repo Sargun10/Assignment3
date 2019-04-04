@@ -30,8 +30,6 @@ public class BgIntentService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         intent.setAction(Constants.INTENT_SERVICE_FILTER_ACTION_KEY);
-        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-
         DbHelper dbHelper = new DbHelper(this);
         dbHelper.getWritableDatabase();
         String previousStudentId = new String();
@@ -53,6 +51,7 @@ public class BgIntentService extends IntentService {
             default:
                 break;
         }
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
     }
 
 }

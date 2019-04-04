@@ -3,26 +3,30 @@ package com.example.assignment3.service;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
-import android.util.Log;
+import android.os.Bundle;
+import android.telecom.Call;
 
 import com.example.assignment3.database.DbHelper;
 import com.example.assignment3.model.Student;
-import com.example.assignment3.activity.StudentListActivity;
 import com.example.assignment3.util.Constants;
 
 
-public class BgAsync extends AsyncTask<Object,Void,Void> {
+public class BgAsync extends AsyncTask<Object,Void,String> {
 
     private Context context;
     private SQLiteDatabase db;
-    public BgAsync(Context context) {
+    private CallBackAsync callBackAsyncListener;
+    private Student student;
+    private String mode;
+    public BgAsync(Context context,CallBackAsync callBackAsync) {
         this.context=context;
+        this.callBackAsyncListener=callBackAsync;
     }
 
     @Override
-    protected Void doInBackground(Object... objects) {
-        Student student = (Student) objects[0];
-        String mode = (String) objects[1];
+    protected String doInBackground(Object... objects) {
+        student = (Student) objects[0];
+        mode = (String) objects[1];
         String previousStudentId = (String) objects[2];
         DbHelper dbHelper=new DbHelper(context);
         switch (mode){
@@ -49,7 +53,14 @@ public class BgAsync extends AsyncTask<Object,Void,Void> {
     }
 
     @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
+    protected void onPostExecute(String s) {
+        super.onPostExecute(s);
+        callBackAsyncListener.asyncCallBack();
+
+
+    }
+
+    public interface CallBackAsync{
+        void asyncCallBack();
     }
 }

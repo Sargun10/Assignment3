@@ -51,13 +51,15 @@ import static android.app.Activity.RESULT_OK;
  * <p>
  * create an instance of this fragment.
  */
-public class StudentListFragment extends Fragment{
+public class StudentListFragment extends Fragment implements StudentAdapter.ClickRvItem {
     private CommunicationFragments mListener;
     private ArrayList<Student> studentArrayList;
     private StudentAdapter mStudentAdapter;
     private Context mContext;
     public RecyclerView rvStudents;
     private Button btnAdd;
+    private int pos;
+    private StudentAdapter.ClickRvItem rvListener;
 
     public StudentListFragment() {
         // Required empty public constructor
@@ -67,7 +69,7 @@ public class StudentListFragment extends Fragment{
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        this.mContext=context;
+        this.mContext = context;
         if (context instanceof CommunicationFragments) {
             mListener = (CommunicationFragments) context;
         } else {
@@ -79,7 +81,7 @@ public class StudentListFragment extends Fragment{
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        studentArrayList= new ArrayList<>();
+        studentArrayList = new ArrayList<>();
         super.onCreate(savedInstanceState);
     }
 
@@ -89,19 +91,21 @@ public class StudentListFragment extends Fragment{
         initViews(view);
         setHasOptionsMenu(true);
         mContext = getActivity();
-        studentArrayList=getArguments().getParcelableArrayList(Constants.BUNDLE_ARRAY_LIST);
-        mStudentAdapter = new StudentAdapter(studentArrayList, mContext);
+        rvListener=this;
+        studentArrayList = getArguments().getParcelableArrayList(Constants.BUNDLE_ARRAY_LIST);
+        mStudentAdapter = new StudentAdapter(studentArrayList,rvListener);
         rvStudents.setAdapter(mStudentAdapter);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(mContext.getApplicationContext());
         rvStudents.setLayoutManager(mLayoutManager);
         rvStudents.setItemAnimator(new DefaultItemAnimator());
         mStudentAdapter.notifyDataSetChanged();
-        handleRecyclerClick();
         return view;
     }
+
     /**
      * initializing views and setting OnClick listener on Add button
      * when add button is clicked bundle is sent to activity
+     *
      * @param view
      */
     public void initViews(View view) {
@@ -109,9 +113,9 @@ public class StudentListFragment extends Fragment{
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bundle bundle=new Bundle();
-                bundle.putBoolean(Constants.IS_FROM_ADD,true);
-                bundle.putParcelableArrayList(Constants.BUNDLE_ARRAY_LIST,studentArrayList);
+                Bundle bundle = new Bundle();
+                bundle.putBoolean(Constants.IS_FROM_ADD, true);
+                bundle.putParcelableArrayList(Constants.BUNDLE_ARRAY_LIST, studentArrayList);
                 StudentListFragment.this.setArguments(bundle);
                 mListener.changeFragTab();
                 mListener.getMode(bundle);
@@ -127,56 +131,53 @@ public class StudentListFragment extends Fragment{
      * handling events on clicking on item of recycler view
      * view edit delete
      */
-    public void handleRecyclerClick(){
-        mStudentAdapter.setOnClickListenerRv(new StudentAdapter.clickRvItem() {
+//    public void handleRecyclerClick(){
+//        mStudentAdapter.setOnClickListenerRv(new StudentAdapter.ClickRvItem() {
+    @Override
+    public void onItemClick(final int position) {
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
+        String[] options = {"View", "Edit", "Delete"};
+        alertDialogBuilder.setItems(options, new DialogInterface.OnClickListener() {
             @Override
-            public void onItemClick(final int position) {
-                final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
-                String[] options = {"View", "Edit", "Delete"};
-                alertDialogBuilder.setItems(options, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case Constants.OPTION_VIEW:
-                                viewMode(studentArrayList.get(position));
-                                break;
-                            case Constants.OPTION_EDIT:
-                                editMode(position);
-                                break;
-                            case Constants.OPTION_DELETE:
-                                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        switch (which) {
-                                            case DialogInterface.BUTTON_POSITIVE:
-                                                DbHelper dbHelper=new DbHelper(mContext);
-                                                dbHelper.deleteQuery(studentArrayList.get(position));
-                                                studentArrayList.remove(position);
-                                                mStudentAdapter.notifyDataSetChanged();
-                                                ToastDisplay.displayToast(mContext, getString(R.string.student_deleted));
-                                                break;
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case Constants.OPTION_VIEW:
+                        viewMode(studentArrayList.get(position));
+                        break;
+                    case Constants.OPTION_EDIT:
+                        editMode(position);
+                        break;
+                    case Constants.OPTION_DELETE:
+                        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch (which) {
+                                    case DialogInterface.BUTTON_POSITIVE:
+                                        DbHelper dbHelper = new DbHelper(mContext);
+                                        dbHelper.deleteQuery(studentArrayList.get(position));
+                                        studentArrayList.remove(position);
+                                        mStudentAdapter.notifyDataSetChanged();
+                                        ToastDisplay.displayToast(mContext, getString(R.string.student_deleted));
+                                        break;
 
-                                            case DialogInterface.BUTTON_NEGATIVE:
-                                                dialog.dismiss();
-                                                break;
-                                        }
-                                    }
-                                };
-                                AlertDialog.Builder ab = new AlertDialog.Builder(mContext);
-                                ab.setMessage(getString(R.string.delete_confirm)).setPositiveButton(getString(R.string.yes), dialogClickListener)
-                                        .setNegativeButton(getString(R.string.no), dialogClickListener).show();
-                                break;
-                        }
-                    }
-                });
-                AlertDialog alertDialog = alertDialogBuilder.create();
-                alertDialog.show();
-
-
+                                    case DialogInterface.BUTTON_NEGATIVE:
+                                        dialog.dismiss();
+                                        break;
+                                }
+                            }
+                        };
+                        AlertDialog.Builder ab = new AlertDialog.Builder(mContext);
+                        ab.setMessage(getString(R.string.delete_confirm)).setPositiveButton(getString(R.string.yes), dialogClickListener)
+                                .setNegativeButton(getString(R.string.no), dialogClickListener).show();
+                        break;
+                }
             }
         });
-    }
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
 
+
+    }
 
 
     @Override
@@ -184,10 +185,12 @@ public class StudentListFragment extends Fragment{
         super.onDetach();
         mListener = null;
     }
+
     /**
      * to create options menu for the activity that has two functions
      * to show data in grid or list view
      * to sort data by roll no or by name
+     *
      * @param menu
      * @param menuInflater
      */
@@ -230,37 +233,48 @@ public class StudentListFragment extends Fragment{
                 }
             }
         });
-        super.onCreateOptionsMenu(menu,menuInflater);
+        super.onCreateOptionsMenu(menu, menuInflater);
     }
 
 
     /**
      * this sends data to the ViewStudentActivity and views the student
+     *
      * @param student
      */
-   private void viewMode(final Student student) {
-       Intent intentView = new Intent(mContext, ViewStudentActivity.class);
-       intentView.putExtra(Constants.SELECTED_STUDENT, student);
-       intentView.putExtra(Constants.IS_FROM_VIEW, true);
-       startActivity(intentView);
-   }
+    private void viewMode(final Student student) {
+        Intent intentView = new Intent(mContext, ViewStudentActivity.class);
+        intentView.putExtra(Constants.SELECTED_STUDENT, student);
+        intentView.putExtra(Constants.IS_FROM_VIEW, true);
+        startActivity(intentView);
+    }
+
+    public void addOrUpdateStudentInList(Student student, String mode) {
+        if (mode.equals(Constants.IS_FROM_EDIT)) {
+            studentArrayList.get(pos).setName(student.getName());
+            mStudentAdapter.notifyDataSetChanged();
+        } else if (mode.equals(Constants.IS_FROM_ADD)) {
+            studentArrayList.add(student);
+            mStudentAdapter.notifyDataSetChanged();
+        }
+    }
 
     /**
      * editMode function send bundle to the activity through interface
      * when edit option is selected
+     *
      * @param position
      */
-   private void editMode(final int position) {
-       mListener.changeFragTab();
-       Bundle bundle=new Bundle();
-       Student student=studentArrayList.get(position);
-       bundle.putParcelable(Constants.SELECTED_STUDENT, student);
-       bundle.putInt(Constants.INDEX, position);
-       bundle.putBoolean(Constants.IS_FROM_EDIT,true);
-       mListener.getMode(bundle);
+    private void editMode(final int position) {
+        mListener.changeFragTab();
+        Bundle bundle = new Bundle();
+        Student student = studentArrayList.get(position);
+        bundle.putParcelable(Constants.SELECTED_STUDENT, student);
+        bundle.putInt(Constants.INDEX, position);
+        pos = position;
+        bundle.putBoolean(Constants.IS_FROM_EDIT, true);
+        mListener.getMode(bundle);
 
-   }
-   public void notifyAddedList(){
-       mStudentAdapter.notifyDataSetChanged();
-   }
+    }
+
 }

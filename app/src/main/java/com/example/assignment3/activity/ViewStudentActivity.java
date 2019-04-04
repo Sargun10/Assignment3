@@ -34,6 +34,9 @@ import com.example.assignment3.util.Validate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * on clicking view button from dialog box on clicking on viuewholder of recycler view the new activity displays student details.
+ */
 public class ViewStudentActivity extends AppCompatActivity implements CommunicationFragments {
 
 
@@ -53,12 +56,11 @@ public class ViewStudentActivity extends AppCompatActivity implements Communicat
     protected void onStart() {
         super.onStart();
         Student student = bundle.getParcelable(Constants.SELECTED_STUDENT);
-        Log.d("--------", "onStart: "+student.getName());
         studentFragment.viewStudent(student);
     }
 
     /**
-     *
+     *initializing fragment manager.
      */
     private void init() {
 
@@ -71,13 +73,9 @@ public class ViewStudentActivity extends AppCompatActivity implements Communicat
 
     }
 
-    @Override
-    public void communicateAddStudent(Student student) {
-
-    }
 
     @Override
-    public void communicateEditStudent(Bundle bundle) {
+    public void communicateAddOrUpdateStudent(Student student, String mode) {
 
     }
 
@@ -88,11 +86,6 @@ public class ViewStudentActivity extends AppCompatActivity implements Communicat
 
     @Override
     public void getMode(Bundle bundle) {
-
-    }
-
-    @Override
-    public void refreshStudent() {
 
     }
 }

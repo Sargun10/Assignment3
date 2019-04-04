@@ -34,6 +34,7 @@ import com.example.assignment3.service.BgAsync;
 import com.example.assignment3.service.BgIntentService;
 import com.example.assignment3.service.BgService;
 import com.example.assignment3.util.Constants;
+import com.example.assignment3.util.ToastDisplay;
 import com.example.assignment3.util.Validate;
 
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ import static android.app.Activity.RESULT_OK;
  * create an instance of this fragment.
  */
 
-public class AddStudentFragment extends Fragment{
+public class AddStudentFragment extends Fragment implements BgAsync.CallBackAsync{
     private Button buttonSave;
     private EditText editTextName, editTextRollNo;
     private ArrayList<Student> studentArrayList ;
@@ -58,8 +59,9 @@ public class AddStudentFragment extends Fragment{
     private static boolean mIsFromAdd, mIsFromEdit;
     private DbHelper dbHelper;
     private MyReceiver myReceiver;
+    private BgAsync.CallBackAsync callBackAsync;
     AlertDialog mAlert;
-    Student student;
+    private Student student;
     private CommunicationFragments mListener;
     public AddStudentFragment() {
         // Required empty public constructor
@@ -80,6 +82,7 @@ public class AddStudentFragment extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        callBackAsync=this;
         dbHelper = new DbHelper(mContext);
         validate = new Validate();
         studentArrayList=new ArrayList<>();
@@ -121,13 +124,17 @@ public class AddStudentFragment extends Fragment{
         mSelectedPosition = bundle.getInt(Constants.INDEX, -1);
         mIsFromAdd = bundle.getBoolean(Constants.IS_FROM_ADD, false);
         mIsFromEdit = bundle.getBoolean(Constants.IS_FROM_EDIT, false);
-//        if (mIsFromAdd) {
-//            clearFields();
-//        }
         if (mIsFromEdit) {
             student = bundle.getParcelable(Constants.SELECTED_STUDENT);
             getDataFromEditTexts(student);
         }
+    }
+
+    // to set text in edit texts in case of both edit and view
+    private void getDataFromEditTexts(Student student) {
+        editTextName.setText(student.getName());
+        editTextRollNo.setText(student.getRollNo());
+        editTextRollNo.setEnabled(false);
     }
     /**
      * on click of save button data is fetched from edit text and validations are applied
@@ -156,9 +163,8 @@ public class AddStudentFragment extends Fragment{
                             editTextRollNo.requestFocus();
                             editTextRollNo.setError(getString(R.string.valid_RollNo));
                         } else {
-//                            clearFields();
                             editTextRollNo.setEnabled(true);
-                            Student student = new Student(name, rollNo);
+                             student= new Student(name, rollNo);
                             editTextName.setFocusable(true);
                             editTextRollNo.setFocusable(true);
                             serviceDialogBox(student, Constants.IS_FROM_ADD, rollNo);
@@ -170,8 +176,8 @@ public class AddStudentFragment extends Fragment{
                         editTextName.setError(getString(R.string.valid_name));
                     }
                         else {
-                            Student newstudent = new Student(name, rollNo);
-                            serviceDialogBox(newstudent, Constants.IS_FROM_EDIT,student.getRollNo());
+                            student = new Student(name, rollNo);
+                            serviceDialogBox(student, Constants.IS_FROM_EDIT,student.getRollNo());
                             Bundle bundle = new Bundle();
                             bundle.putInt(Constants.INDEX, mSelectedPosition);
                             bundle.putParcelable(Constants.SELECTED_STUDENT, student);
@@ -181,6 +187,11 @@ public class AddStudentFragment extends Fragment{
 
         });
     }
+
+    /**
+     * on clicking view button in dialog box thi sfunction is called.
+     * @param student
+     */
     public void viewStudent(Student student) {
         editTextName.setEnabled(false);
         rollNo = student.getRollNo();
@@ -189,14 +200,6 @@ public class AddStudentFragment extends Fragment{
         getDataFromEditTexts(student);
         editTextName.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
         editTextRollNo.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
-    }
-
-
-    // to set text in edit texts in case of both edit and view
-    private void getDataFromEditTexts(Student student) {
-        editTextName.setText(student.getName());
-        editTextRollNo.setText(student.getRollNo());
-        editTextRollNo.setEnabled(false);
     }
 
     /**
@@ -209,7 +212,7 @@ public class AddStudentFragment extends Fragment{
 
         final String[] items = {"Services", "Intent Services", "Async Task"};
         final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        builder.setTitle("Select Option to save student details");
+        builder.setTitle(getString(R.string.serviceDialog));
         editTextName.setEnabled(true);
         editTextRollNo.setEnabled(true);
         builder.setItems(items, new DialogInterface.OnClickListener() {
@@ -224,16 +227,6 @@ public class AddStudentFragment extends Fragment{
                         serviceIntent.putExtra(Constants.MODE, mode);
                         serviceIntent.putExtra(Constants.PREVIOUS_STUDENT_ID, previousStudentPosition);
                         mContext.startService(serviceIntent);
-                        if(mIsFromAdd){
-                            mListener.communicateAddStudent(presentStudent);
-                            mListener.changeFragTab();
-                        }
-                        else if(mIsFromEdit){
-                            bundle.putInt(Constants.INDEX,mSelectedPosition);
-                            bundle.putParcelable(Constants.SELECTED_STUDENT, presentStudent);
-                            mListener.communicateEditStudent(bundle);
-                            mListener.changeFragTab();
-                        }
                         break;
                     case 1:
                         Intent iSIntent = new Intent(mContext, BgIntentService.class);
@@ -241,32 +234,14 @@ public class AddStudentFragment extends Fragment{
                         iSIntent.putExtra(Constants.MODE, mode);
                         iSIntent.putExtra(Constants.PREVIOUS_STUDENT_ID, previousStudentPosition);
                         mContext.startService(iSIntent);
-                        if(mIsFromAdd){
-                            mListener.communicateAddStudent(presentStudent);
-                            mListener.changeFragTab();
-                        }
-                        else if(mIsFromEdit){
-                            bundle.putInt(Constants.INDEX,mSelectedPosition);
-                            bundle.putParcelable(Constants.SELECTED_STUDENT, presentStudent);
-                            mListener.communicateEditStudent(bundle);
-                            mListener.changeFragTab();
-                        }
                         break;
                     case 2:
-                        BgAsync bgAsync = new BgAsync(mContext);
+                        BgAsync bgAsync = new BgAsync(mContext,callBackAsync);
                         bgAsync.execute(presentStudent, mode, previousStudentPosition);
-                        if(mIsFromAdd){
-                            mListener.communicateAddStudent(presentStudent);
-                            mListener.changeFragTab();
-                        }
-                        else if(mIsFromEdit){
-                            bundle.putInt(Constants.INDEX,mSelectedPosition);
-                            bundle.putParcelable(Constants.SELECTED_STUDENT, presentStudent);
-                            mListener.communicateEditStudent(bundle);
-                            mListener.changeFragTab();
-                        }
                         break;
                 }
+                mListener.communicateAddOrUpdateStudent(student,mode);
+                mAlert.dismiss();
 
             }
         });
@@ -301,12 +276,20 @@ public class AddStudentFragment extends Fragment{
         editTextName.setText("");
     }
 
+    @Override
+    public void asyncCallBack() {
+        ToastDisplay.displayToast(mContext,getString(R.string.asyncTaskMsg));
+        mListener.changeFragTab();
+    }
+
+    /**
+     * broadcast receiver class.
+     */
     private class MyReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(Constants.SERVICE_FILTER_ACTION_KEY) || intent.getAction().equals(Constants.INTENT_SERVICE_FILTER_ACTION_KEY)) {
-                mAlert.dismiss();
                 mListener.changeFragTab();
             }
         }

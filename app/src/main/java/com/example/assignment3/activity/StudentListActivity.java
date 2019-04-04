@@ -5,6 +5,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.assignment3.R;
 import com.example.assignment3.adapter.MyPagerAdapter;
@@ -13,6 +14,7 @@ import com.example.assignment3.database.DbHelper;
 import com.example.assignment3.fragment.AddStudentFragment;
 import com.example.assignment3.fragment.StudentListFragment;
 import com.example.assignment3.model.Student;
+import com.example.assignment3.service.BgAsync;
 import com.example.assignment3.util.Constants;
 
 import java.util.ArrayList;
@@ -21,16 +23,15 @@ public class StudentListActivity extends AppCompatActivity implements Communicat
     private ViewPager viewPager;
     private TabLayout tabLayout;
     private ArrayList<Student> studentArrayList ;
-    AddStudentFragment addStudentFragment;
-    StudentListFragment studentListFragment;
+    private AddStudentFragment addStudentFragment;
+    private StudentListFragment studentListFragment;
+    private  DbHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_list);
-        DbHelper dbHelper = new DbHelper(this);
-        //  dbHelper.createTable();
-
+        dbHelper = new DbHelper(this);
         studentArrayList = dbHelper.getAllStudents();
         viewPager = findViewById(R.id.viewPager);
         tabLayout = findViewById(R.id.tabLayout);
@@ -50,11 +51,11 @@ public class StudentListActivity extends AppCompatActivity implements Communicat
                     addStudentFragment.getMode(bundle);
                     addStudentFragment.scrolled();
                 }
-//                if(i==1){
-//                    addStudentFragment.clearFields();
-//                }
-//                else
-//                    bundle.putBoolean(Constants.IS_FROM_ADD,true);
+                if(i==1){
+                    addStudentFragment.clearFields();
+                }
+                else
+                    bundle.putBoolean(Constants.IS_FROM_ADD,true);
             }
 
             @Override
@@ -95,24 +96,10 @@ public class StudentListActivity extends AppCompatActivity implements Communicat
         viewPager.setAdapter(myPagerAdapter);
     }
     @Override
-    public void communicateAddStudent(Student student) {
-        Log.d("----------", "communicateAddStudent: "+studentArrayList.size());
-        studentArrayList.add(student);
-        Log.d("h", "communicateAddStudent: ");
-        changeTab();
-    }
-
-    @Override
-    public void communicateEditStudent(Bundle bundle) {
-        studentArrayList=bundle.getParcelableArrayList(Constants.BUNDLE_ARRAY_LIST);
-        Student student = bundle.getParcelable(Constants.SELECTED_STUDENT);
-        int index = bundle.getInt(Constants.INDEX);
-        Log.d("----------", "communicateEditStudent: "+index);
-        studentArrayList.remove(index);
-        studentArrayList.add(index,student);
-
+    public void communicateAddOrUpdateStudent(Student student, String mode) {
         studentListFragment = (StudentListFragment) getSupportFragmentManager().getFragments().get(0);
-        changeTab();
+        studentListFragment.addOrUpdateStudentInList(student,mode);
+
     }
 
     @Override
@@ -122,22 +109,21 @@ public class StudentListActivity extends AppCompatActivity implements Communicat
 
     @Override
     public void getMode(Bundle bundle) {
-        AddStudentFragment addStudentFragment = (AddStudentFragment) getSupportFragmentManager().getFragments().get(1);
+        addStudentFragment = (AddStudentFragment) getSupportFragmentManager().getFragments().get(1);
         if (addStudentFragment != null) {
             addStudentFragment.getMode(bundle);
-            Log.d("aaaaaaaaaaaa", "getMode: "+studentArrayList);
             studentArrayList = bundle.getParcelableArrayList(Constants.BUNDLE_ARRAY_LIST);
             addStudentFragment.scrolled();
         }
     }
-
-    @Override
-    public void refreshStudent() {
-        StudentListFragment studentListFragment = new StudentListFragment();
-        studentListFragment.notifyAddedList();
-        changeTab();
-
-    }
+//
+//    @Override
+//    public void refreshStudent() {
+//        studentListFragment = new StudentListFragment();
+//        studentListFragment.notifyAddedList();
+//        changeTab();
+//
+//    }
 }
 
 

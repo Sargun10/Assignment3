@@ -10,13 +10,7 @@ public interface CommunicationFragments {
      * from one fragment to another on adding a new student
      * @param student
      */
-    public void communicateAddStudent(Student student);
-
-    /**
-     * this function is to communicate bundle from one fragment to another
-     * @param bundle
-     */
-    public void communicateEditStudent(Bundle bundle);
+    public void communicateAddOrUpdateStudent(Student student, String mode);
 
     /**
      * this function is to change tab after the student has been added or edited
@@ -28,5 +22,4 @@ public interface CommunicationFragments {
      * @param bundle
      */
     public void getMode(Bundle bundle);
-    public void refreshStudent();
 }
