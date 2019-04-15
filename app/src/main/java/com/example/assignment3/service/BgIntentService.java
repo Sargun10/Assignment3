@@ -43,7 +43,7 @@ public class BgIntentService extends IntentService {
                 dbHelper.insertQuery(student);
                 break;
             case Constants.IS_FROM_EDIT:
-                dbHelper.updateQuery(student,previousStudentId);
+                dbHelper.updateQuery(student);
                 break;
             case Constants.IS_FROM_DELETE:
                 dbHelper.deleteQuery(student);

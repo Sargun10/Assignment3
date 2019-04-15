@@ -134,7 +134,6 @@ public class AddStudentFragment extends Fragment implements BgAsync.CallBackAsyn
     private void getDataFromEditTexts(Student student) {
         editTextName.setText(student.getName());
         editTextRollNo.setText(student.getRollNo());
-        editTextRollNo.setEnabled(false);
     }
     /**
      * on click of save button data is fetched from edit text and validations are applied
@@ -194,6 +193,7 @@ public class AddStudentFragment extends Fragment implements BgAsync.CallBackAsyn
      */
     public void viewStudent(Student student) {
         editTextName.setEnabled(false);
+        editTextRollNo.setEnabled(false);
         rollNo = student.getRollNo();
         name = student.getName();
         buttonSave.setVisibility(View.INVISIBLE);
@@ -213,8 +213,6 @@ public class AddStudentFragment extends Fragment implements BgAsync.CallBackAsyn
         final String[] items = {"Services", "Intent Services", "Async Task"};
         final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         builder.setTitle(getString(R.string.serviceDialog));
-        editTextName.setEnabled(true);
-        editTextRollNo.setEnabled(true);
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {

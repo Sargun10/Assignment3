@@ -37,7 +37,7 @@ public class BgAsync extends AsyncTask<Object,Void,String> {
                 break;
             case Constants.IS_FROM_EDIT:
                 db=dbHelper.getWritableDatabase();
-                dbHelper.updateQuery(student,previousStudentId);
+                dbHelper.updateQuery(student);
                 db.close();
                 break;
             case Constants.IS_FROM_DELETE:

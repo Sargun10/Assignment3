@@ -20,9 +20,6 @@ import static com.example.assignment3.database.table.StudentTable.TABLE_NAME;
 
 public class DbHelper extends SQLiteOpenHelper {
     private final static int DB_VERSION=1;
-
-//    String CREATE_TABLE_QUERY;
-    private static final String createTableQuery= " CREATE TABLE " + StudentTable.TABLE_NAME + "(" + StudentTable.COL_ROLL_NO + " INTEGER PRIMARY KEY, " + StudentTable.COL_NAME + " TEXT)";
     public DbHelper(Context context) {
         super(context, Constants.DB_NAME, null, DB_VERSION);
 
@@ -30,27 +27,16 @@ public class DbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-
-        db.execSQL(createTableQuery);
-//        createTable();
-        Log.d("aaa","after create table");
+        db.execSQL(StudentTable.createTableQuery);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
     }
-//    public void createTable(){
-//        CREATE_TABLE_QUERY=" CREATE TABLE " + StudentTable.TABLE_NAME + "(" + StudentTable.COL_ROLL_NO + " INTEGER PRIMARY KEY, " + StudentTable.COL_NAME + "TEXT" + ");";
-//
-//        db.execSQL(CREATE_TABLE_QUERY);
-//        Log.d("aaa","after execSql");
-//    }
+
     public void insertQuery(Student student){
-        Log.d("aaaaaa", "pahuncha"+student.toString());
         ContentValues studentRecord=new ContentValues();
-
-
         studentRecord.put(StudentTable.COL_ROLL_NO,student.getRollNo());
         studentRecord.put(StudentTable.COL_NAME,student.getName());
         SQLiteDatabase db=this.getWritableDatabase();
@@ -73,17 +59,11 @@ public class DbHelper extends SQLiteOpenHelper {
         return studentArrayList;
     }
 
-    public void updateQuery(Student student, String rollNo){
-        Log.d("---------", "updateQuery: "+student.getName()+""+student.getRollNo()+" "+rollNo);
+    public void updateQuery(Student student){
         SQLiteDatabase db=this.getWritableDatabase();
         ContentValues studentRecord=new ContentValues();
         studentRecord.put(StudentTable.COL_ROLL_NO,Integer.parseInt(student.getRollNo()));
         studentRecord.put(StudentTable.COL_NAME,student.getName());
-        Log.d("------", "updateQuery: "+studentRecord.get(StudentTable.COL_ROLL_NO)+ " "+  studentRecord.get(StudentTable.COL_NAME));
-        String updateQueryPart=StudentTable.COL_ROLL_NO + "=?";
-
-        long res=db.update(StudentTable.TABLE_NAME,studentRecord,updateQueryPart,new String[]{rollNo});
-        Log.d("--------", "updateQuery: "+res );
         db.close();
 
     }
