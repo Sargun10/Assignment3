@@ -22,45 +22,24 @@
 
         />
 
-        <TextView
-            android:id="@+id/textViewName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/padding2dp"
-            android:layout_marginLeft="@dimen/marginLeft5dp"
-            android:text="Name  :"
-            android:textSize="@dimen/smallFontSize"
-            android:layout_toRightOf="@+id/imageView" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/textViewName2"
-            android:layout_toRightOf="@+id/textViewName"
+            android:layout_toRightOf="@+id/imageView"
             android:padding="@dimen/padding2dp"
             android:textSize="@dimen/smallFontSize"
 
 
             />
 
-        <TextView
-            android:id="@+id/textViewRollNo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/marginLeft5dp"
-            android:padding="@dimen/padding2dp"
-            android:text="Roll No:"
-            android:textSize="@dimen/smallFontSize"
-            android:layout_toRightOf="@id/imageView"
-            android:layout_below="@+id/textViewName"
-
-            />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/textViewRollNo2"
-            android:layout_toRightOf="@+id/textViewRollNo"
+            android:layout_toRightOf="@+id/imageView"
             android:layout_below="@+id/textViewName2"
             android:padding="@dimen/padding2dp"
             android:textSize="@dimen/smallFontSize"

@@ -35,7 +35,7 @@ public class SplashActivity extends AppCompatActivity {
      * show the respective next screen and finish the current one
      */
     private void showNextScreenAndFinish() {
-        SplashActivity.this.startActivity(new Intent(SplashActivity.this, StudentListActivity.class));
+        startActivity(new Intent(SplashActivity.this, StudentListActivity.class));
         finish();
     }
 }

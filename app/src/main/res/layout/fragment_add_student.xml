@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.AddStudentActivity">
+    android:id="@+id/frag_add">
 
     <ImageView
         android:id="@+id/imageView2"
@@ -39,7 +39,7 @@
         android:inputType="number"
         android:textSize="@dimen/fontSize"
         android:padding="@dimen/paddingEt"
-         />
+        />
 
     <Button
         android:layout_width="match_parent"
@@ -47,7 +47,7 @@
         android:id="@+id/buttonSave"
         android:text="Save"
         android:layout_alignParentBottom="true"
-        android:onClick="onClickSave"
+
         />
 
 

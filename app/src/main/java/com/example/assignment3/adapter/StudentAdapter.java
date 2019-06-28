@@ -3,7 +3,9 @@ package com.example.assignment3.adapter;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -20,13 +22,11 @@ import java.util.ArrayList;
 public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentViewHolder> {
 
     private ArrayList<Student> studentsArrayList;
-    private Context context;
-    private int position;
-    private clickRvItem mListener;
+    private ClickRvItem mListener;
 
-    public StudentAdapter(ArrayList<Student> studentsArrayList, Context context) {
+    public StudentAdapter(ArrayList<Student> studentsArrayList, ClickRvItem listener) {
         this.studentsArrayList = studentsArrayList;
-        this.context = context;
+        this.mListener=listener;
     }
 /*onCreateViewHolder inflates layout of viewholder on the screen
 @param viewGroup and i viewGroup is parent on which layout is inflated
@@ -36,21 +36,23 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentV
     @Override
     public StudentViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
-
         View view = inflater.inflate(R.layout.student_viewholder_layout, viewGroup, false);
-
-
-        return new StudentViewHolder(view, studentsArrayList);
+        return new StudentViewHolder(view);
     }
 /*onBindViewHolder binds layout file with the viewholder of recycler view
     @param viewHolder and i viewholder that is clicked
 
  */
     @Override
-    public void onBindViewHolder(@NonNull StudentViewHolder viewHolder, int i) {
-
+    public void onBindViewHolder(@NonNull final StudentViewHolder viewHolder, int i) {
         viewHolder.textViewName2.setText(studentsArrayList.get(i).getName());
         viewHolder.textViewRollno2.setText(studentsArrayList.get(i).getRollNo());
+        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onItemClick(viewHolder.getAdapterPosition());
+            }
+        });
     }
     /*getitemcount keeps track of the size of the recycler view
 
@@ -64,38 +66,39 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentV
     /*studentviewholder class is viewholder that is made clickable
     it has arraylist,textviews,context,students
      */
-    public class StudentViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private TextView textViewName, textViewName2;
-        private TextView textViewRollNo, textViewRollno2;
+    public class StudentViewHolder extends RecyclerView.ViewHolder {
+        private TextView textViewName2;
+        private TextView textViewRollno2;
 
         /*constructor to setlistener on itemview, have context of calling activity,student arraylist
 
  */
-        public StudentViewHolder(@NonNull View itemView, ArrayList<Student> context) {
+        public StudentViewHolder(@NonNull View itemView) {
             super(itemView);
-            itemView.setOnClickListener(this);
-            initViews();
+            initViews(itemView);
+//            itemView.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    mListener.onItemClick(getAdapterPosition());
+//                }
+//            });
         }
     /*initviews are finding views of xml file
  */
 
-        private void initViews() {
-            textViewName = itemView.findViewById(R.id.textViewName);
+        private void initViews(View itemView) {
             textViewName2 = itemView.findViewById(R.id.textViewName2);
-            textViewRollNo = itemView.findViewById(R.id.textViewRollNo);
             textViewRollno2 = itemView.findViewById(R.id.textViewRollNo2);
         }
         /*onClick of the viewHolder dialog box is opened with options view,edit,delete
         case 0 is view mode case 1 is edit mode and case 2 is delete
         @param view which is clicked
          */
-        @Override
-        public void onClick(View v) {
-            mListener = (clickRvItem) context;
-            mListener.onItemClick(getAdapterPosition());
-        }
     }
-    public interface clickRvItem{
+    public interface ClickRvItem{
+//        boolean onCreateOptionsMenu(Menu menu);
+
         void onItemClick(int position);
     }
+
 }

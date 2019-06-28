@@ -28,32 +28,12 @@ public class Validate {
         }
         return isRollNoUnique;
     }
-/*
-overloaded function to check unique roll no in array list on editing details of student leaving the index of student to be edited
-@param index of the student in student array list to be left out while checking for unique
-@return boolean value if roll no is valid in listr or not
- */
-    public boolean uniqueValidation(ArrayList<Student> studentArrayList,String rollNo,int index){
-        boolean isRollNoUnique=true;
-        int pos=0;
-        for(int i=0;i<studentArrayList.size();i++){
-            if(studentArrayList.get(i).getRollNo().equals(rollNo)){
-                pos = i;
-            }
-        }
 
-            for(int i=0;i<studentArrayList.size();i++){
-                if(pos != index && studentArrayList.get(i).getRollNo().equals(rollNo)){
-                    isRollNoUnique=false;
-                    break;
-                }
-            }
-        return isRollNoUnique;
-
-    }
-/*
-to check if name has only alphabets
- */
+    /**
+     * to check if name has only alphabets
+     * @param name
+     * @return
+     */
     public boolean isStringOnly(String name){
             return name.matches("^[a-zA-Z\\s]*$");
     }
